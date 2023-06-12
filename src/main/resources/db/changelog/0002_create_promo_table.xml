@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="0002" author="dk">
+        <createTable tableName="promo">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(500)"/>
+            <column name="description" type="VARCHAR(20000)"/>
+            <column name="price" type="DECIMAL(20,2)"/>
+            <column name="url_address" type="VARCHAR(1000)"/>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_filename" type="VARCHAR(300)"/>
+            <column name="user_id" type="BIGINT"/>
+            <column name="local_date_time" type="DATETIME"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="promo"
+                                 baseColumnNames="category_id"
+                                 constraintName="fk_promo_category_id"
+                                 referencedTableName="category"
+                                 referencedColumnNames="id"/>
+
+    </changeSet>
+</databaseChangeLog>

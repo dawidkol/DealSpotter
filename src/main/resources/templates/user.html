@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments::head(title = 'Panel użytkownika')}">
+</head>
+<body>
+
+<nav th:replace="~{fragments::login-navbar}">
+</nav>
+<div class="container">
+<h3 th:text="|Witaj ${user.firstName}|"></h3>
+  <ul>
+    <Li sec:authorize="hasRole('USER')"><a href="/user/promo/all">Twoje ogłoszenia</a></Li>
+    <li><a href="#" th:href="@{/user/change-password}">Zmień hasło</a></li>
+  </ul>
+
+</div>
+<footer th:replace="~{fragments::footer}">Footer</footer>
+</body>
+</html>

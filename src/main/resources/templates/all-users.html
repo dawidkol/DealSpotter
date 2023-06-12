@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments::head(title ='Admin - lista promocji')}">
+    <meta charset="UTF-8">
+    <title>Lista-użytkowników</title>
+</head>
+<body>
+<nav th:replace="~{fragments::login-navbar}">
+</nav>
+<div class="container">
+    <h1>Lista użytkowników</h1>
+<table>
+    <thead>
+    <tr>
+        <th scope="col">Email</th>
+        <th scope="col">Akcja</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user: ${allUsers}" th:object="${user}">
+        <td th:text="*{email}">Nazwa</td>
+        <td><a th:href="|/admin/user/delete/*{email}|">Usuń</a></td>
+    </tr>
+    </tbody>
+</table>
+</div>
+<footer th:replace="~{fragments::footer}"></footer>
+</table>
+
+</body>
+</html>

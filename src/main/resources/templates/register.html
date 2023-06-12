@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments::head(title = 'Zarejestruj')}">
+
+</head>
+<body>
+<div class="form container">
+    <nav th:replace="~{fragments::login-navbar}"></nav>
+
+    <form method="post" th:action="@{/register}" action="#" th:object="${user}">
+        <h3>Panel rejestracji</h3>
+        <label>
+            Imię:
+            <input th:field="*{firstName}" type="text" placeholder="Jan" required>
+            <p class="error" th:errors="*{firstName}"></p>
+        </label>
+        <label>
+            Nazwisko:
+            <input th:field="*{lastName}" type="text" placeholder="Kowalski" required>
+            <p class="error" th:errors="*{lastName}"></p>
+        </label>
+        <label>
+            Email:
+            <input th:field="*{email}" type="email" placeholder="jan.kowalski@abc.pl" required>
+            <p class="error" th:errors="*{email}"></p>
+        </label>
+        <label>
+            Hasło:
+            <input th:field="*{password}" type="password" placeholder="TrudneHasło123" required>
+            <p class="error" th:errors="*{password}"></p>
+        </label>
+        <button type="submit">Rejestruj</button>
+
+    </form>
+</div>
+
+<footer th:replace="~{fragments::footer}"></footer>
+</footer>
+
+
+</body>
+</html>

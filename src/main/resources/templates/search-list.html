@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments::head(title = ${searchString + ' - Niska cena'})}">
+</head>
+<body>
+
+
+<div class="container">
+    <nav th:replace="~{fragments::navbar}">
+    </nav>
+
+
+<div class="product-list">
+    <h2>Lista produktów</h2>
+    <a th:each="promo: ${promoList}" th:href="${'/promo/' + promo.id}"> <br>
+        <img  src="" width="200px" height="200px">
+        <span  th:text="${promo.name}"> </span>
+        <span  th:text="${promo.price}"> </span>
+
+    </a>
+</div>
+
+</div>
+</body>
+</html>

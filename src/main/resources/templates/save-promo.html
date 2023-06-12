@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+>
+<head th:replace="~{fragments::head(title='Panel logowania')}">
+<body>
+<nav th:replace="~{fragments::login-navbar}">
+</nav>
+
+<div  class="form container">
+<form th:fragment="save-promo-form" method="post" th:action="@{/promo/save}" th:object="${promo}" enctype="multipart/form-data">
+
+    <label>
+        Nazwa
+        <input th:field="*{name}" type="text" required>
+        <p class="error" th:errors="*{name}">Bład</p>
+    </label>
+    <label>
+        Opis
+        <textarea class="form-description" th:field="*{description}" required>
+        </textarea>
+        <p class="error" th:errors="*{description}">Błąd</p>
+    </label>
+    <label>
+        Cena:
+        <input th:field="*{price}" type="number" min="0.00"  placeholder="99.99" step="0.01" required>
+        <p class="error" th:errors="*{price}">Błąd</p>
+    </label>
+    <label>
+        Link do promocji
+        <input th:field="*{urlAddress}" type="url" required>
+        <p class="error"th:errors="*{urlAddress}">Błąd</p>
+    </label>
+    <label th:field="*{category}" th:replace="~{fragments::category}">
+        Kategoria
+    </label>
+    <label>
+        Dodaj zdjęcie
+        <input type="file" th:field="*{imageFilename}" />
+    </label>
+    <button type="submit">Dodaj</button>
+</form>
+</div>
+<footer th:replace="~{fragments::footer}">
+</footer>
+
+</body>
+
+</html>

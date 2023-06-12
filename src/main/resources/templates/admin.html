@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments::head(title = 'Panel administratora')}">
+</head>
+<body>
+
+<nav th:replace="~{fragments::login-navbar}">
+</nav>
+<div class="container">
+  <h3 th:text="|Witaj ${user.firstName}|"></h3>
+  <ul>
+    <li sec:authorize="hasRole('ADMIN')"><a  href="/admin/promo/all">Lista promocji</a></li>
+    <li sec:authorize="hasRole('ADMIN')"><a  href="/admin/users/all">Lista użytkowników</a></li>
+    <li><a href="#" th:href="@{/user/change-password}">Zmień hasło</a></li>
+  </ul>
+
+</div>
+<footer th:replace="~{fragments::footer}">Footer</footer>
+</body>
+</html>
