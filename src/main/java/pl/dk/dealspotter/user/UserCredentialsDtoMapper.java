@@ -10,12 +10,14 @@ import java.util.stream.Collectors;
 @Service
 class UserCredentialsDtoMapper {
     UserCredentialsDto userCredentialsDto(User user) {
-        String email = user.getEmail();
-        String password = user.getPassword();
-        Set<String> roles = user.getRoles()
-                .stream()
-                .map(UserRole::getName)
-                .collect(Collectors.toSet());
-        return new UserCredentialsDto(email, password, roles);
+        return UserCredentialsDto.builder()
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .roles(getUserRoles(user))
+                .build();
+    }
+
+    private static Set<String> getUserRoles(User user) {
+        return user.getRoles().stream().map(UserRole::getName).collect(Collectors.toSet());
     }
 }

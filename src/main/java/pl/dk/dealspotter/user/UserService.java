@@ -1,7 +1,6 @@
 package pl.dk.dealspotter.user;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Validator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,17 +21,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserCredentialsDtoMapper userCredentialsDtoMapper;
     private final UserDtoMapper userDtoMapper;
-    private final Validator validator;
 
 
-    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder, UserCredentialsDtoMapper userCredentialsDtoMapper, UserDtoMapper userDtoMapper, Validator validator) {
+    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder, UserCredentialsDtoMapper userCredentialsDtoMapper, UserDtoMapper userDtoMapper) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.userCredentialsDtoMapper = userCredentialsDtoMapper;
-
         this.userDtoMapper = userDtoMapper;
-        this.validator = validator;
+
     }
 
     public Optional<UserCredentialsDto> findCredentialsByEmail(String email) {
@@ -69,14 +66,14 @@ public class UserService {
         return userRepository.findByEmail(email).map(userDtoMapper::map);
     }
 
-    public Optional<List<UserDto>> findAllUsers() {
+    public List<UserDto> findAllUsers() {
         if (checkAuthority()) {
             List<UserDto> users = ((List<User>) (userRepository.findAll()))
                     .stream()
                     .filter(user -> user.getRoles().stream().allMatch(x -> x.getName().equalsIgnoreCase(USER_ROLE)))
                     .map(userDtoMapper::map)
                     .toList();
-            return Optional.ofNullable(users);
+            return users;
         }
         throw new SecurityException("Brak uprawnień do strony");
     }

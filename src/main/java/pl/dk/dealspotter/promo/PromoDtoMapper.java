@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.dk.dealspotter.category.Category;
 import pl.dk.dealspotter.category.CategoryRepository;
+import pl.dk.dealspotter.user.User;
 import pl.dk.dealspotter.user.UserDtoMapper;
 import pl.dk.dealspotter.user.UserRepository;
 import pl.dk.dealspotter.user.dto.UserDto;
@@ -26,39 +27,50 @@ class PromoDtoMapper {
     }
 
     PromoDto map(Promo promo) {
-        PromoDto promoDto = new PromoDto();
-        promoDto.setId(promo.getId());
-        promoDto.setName(promo.getName());
-        promoDto.setDescription(promo.getDescription());
-        promoDto.setPrice(promo.getPrice());
-        promoDto.setUrlAddress(promo.getUrlAddress());
-        promoDto.setCategory(promo.getCategory().getName());
-        promoDto.setImageFilename(promo.getImageFilename());
-        UserDto user = userRepository.findById(promo.getUser().getId())
-                .map(userDtoMapper::map).orElseThrow(NoSuchElementException::new);
-        promoDto.setUserDto(user);
-        promoDto.setLocalDateTime(promo.getLocalDateTime());
-        return promoDto;
+        return PromoDto.builder()
+                .id(promo.getId())
+                .name(promo.getName())
+                .description(promo.getDescription())
+                .price(promo.getPrice())
+                .urlAddress(promo.getUrlAddress())
+                .category(promo.getCategory().getName())
+                .imageFilename(promo.getImageFilename())
+                .userDto(getUserDto(promo))
+                .localDateTime(promo.getLocalDateTime())
+                .build();
+    }
+
+    private UserDto getUserDto(Promo promo) {
+        return userRepository.findById(promo.getUser().getId()).map(userDtoMapper::map).orElseThrow(NoSuchElementException::new);
     }
 
     Promo map(SavePromoDto savePromoDto) {
-        Promo promo = new Promo();
-        promo.setId(savePromoDto.getId());
-        promo.setName(savePromoDto.getName());
-        promo.setDescription(savePromoDto.getDescription());
-        promo.setPrice(savePromoDto.getPrice());
-        promo.setUrlAddress(savePromoDto.getUrlAddress());
-        Category category = categoryRepository.findByName(savePromoDto.getCategory()).orElseThrow(NoSuchElementException::new);
+        return Promo.builder()
+                .id(savePromoDto.getId())
+                .name(savePromoDto.getName())
+                .description(savePromoDto.getDescription())
+                .price(savePromoDto.getPrice())
+                .urlAddress(savePromoDto.getUrlAddress())
+                .category(getCategory(savePromoDto))
+                .imageFilename(setImage(savePromoDto))
+                .user(getCurrentUser())
+                .localDateTime(LocalDateTime.now())
+                .build();
+    }
 
-        promo.setCategory(category);
+    private Category getCategory(SavePromoDto savePromoDto) {
+        return categoryRepository.findByName(savePromoDto.getCategory()).orElseThrow(NoSuchElementException::new);
+    }
+
+    private User getCurrentUser() {
+        return userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(NoSuchElementException::new);
+    }
+
+    private String setImage (SavePromoDto savePromoDto) {
         if (savePromoDto.getImageFilename().isEmpty()) {
-            promo.setImageFilename(null);
+            return Promo.builder().imageFilename(null).toString();
         } else {
-            promo.setImageFilename(savePromoDto.getImageFilename());
+            return Promo.builder().imageFilename(savePromoDto.getImageFilename()).toString();
         }
-        promo.setUser(userRepository.findByEmail(SecurityContextHolder
-                .getContext().getAuthentication().getName()).orElseThrow(NoSuchElementException::new));
-        promo.setLocalDateTime(LocalDateTime.now());
-        return promo;
     }
 }

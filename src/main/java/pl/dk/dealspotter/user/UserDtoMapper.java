@@ -7,11 +7,11 @@ import pl.dk.dealspotter.user.dto.UserDto;
 public class UserDtoMapper {
 
     public UserDto map(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setFirstName(user.getFirstName());
-        userDto.setLastName(user.getLastName());
-        userDto.setEmail(user.getEmail());
-        userDto.setPromo(user.getPromo());
-        return userDto;
+        return UserDto.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .promo(user.getPromo())
+                .build();
     }
 }

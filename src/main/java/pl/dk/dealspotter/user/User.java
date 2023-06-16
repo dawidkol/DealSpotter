@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import pl.dk.dealspotter.promo.Promo;
 
 import java.util.HashSet;
@@ -13,6 +16,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "application_user")
+@NoArgsConstructor
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -38,59 +44,4 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Promo> promo;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Set<UserRole> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<UserRole> roles) {
-        this.roles = roles;
-    }
-
-    public List<Promo> getPromo() {
-        return promo;
-    }
-
-    public void setPromo(List<Promo> promo) {
-        this.promo = promo;
-    }
 }

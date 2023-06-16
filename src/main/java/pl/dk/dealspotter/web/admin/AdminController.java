@@ -13,7 +13,6 @@ import pl.dk.dealspotter.user.UserService;
 import pl.dk.dealspotter.user.dto.UserDto;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/admin")
@@ -52,7 +51,7 @@ class AdminController {
 
     @GetMapping("/users/all")
     String allUsers(Model model) {
-        List<UserDto> allUsers = userService.findAllUsers().orElseThrow(NoSuchElementException::new);
+        List<UserDto> allUsers = userService.findAllUsers();
         model.addAttribute("allUsers", allUsers);
         return "all-users";
     }
