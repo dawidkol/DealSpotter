@@ -60,7 +60,7 @@ public class PromoService {
         return list.stream()
                 .filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
                 .filter(a -> a.getCategory().getName().equalsIgnoreCase(category))
-                .map(promoDtoMapper::map)
+                .map(promoDtoMapper::map) 
                 .toList();
     }
 

@@ -68,6 +68,7 @@ class PromoDtoMapper {
 
     private String setImage (SavePromoDto savePromoDto) {
         if (savePromoDto.getImageFilename().isEmpty()) {
+            savePromoDto.setImageFilename("empty-image.png");
             return savePromoDto.getImageFilename();
         } else {
             return savePromoDto.getImageFilename();

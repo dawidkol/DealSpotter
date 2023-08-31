@@ -7,9 +7,11 @@
 <nav th:replace="~{fragments::login-navbar}">
 </nav>
 <main>
-    <div class="form container">
-    <h1>Rejestracja zakończona pomyślnie</h1>
-    <a href="#" th:href="@{/}">Powrót do strony głównej</a>
+    <div class="container">
+        <div class="confirmation">
+            <i class="fa-solid fa-face-smile fa-bounce fa-10x"></i>
+            <h2>Rejestracja zakończona pomyślnie</h2>
+        </div>
     </div>
 </main>
 <footer th:replace="~{fragments::footer}">
