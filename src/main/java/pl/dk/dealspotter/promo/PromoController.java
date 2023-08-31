@@ -49,7 +49,6 @@ class PromoController {
             fileStorageRepository.save(imageFile.getOriginalFilename(), imageFile.getInputStream());
             return "redirect:/promo/save/confirmation";
         }
-
     }
 
     @GetMapping("/save/confirmation")
@@ -57,6 +56,7 @@ class PromoController {
         return "save-promo-confirmation";
     }
 
+/*
     @GetMapping("/{id}")
     String getPromo(@PathVariable Long id, Model model) {
         PromoDto promo = promoService.getPromoById(id)
@@ -64,6 +64,7 @@ class PromoController {
         model.addAttribute("promo", promo);
         return "promo";
     }
+*/
 
     @GetMapping("/edit/{id}")
     public String editPromo(@PathVariable Long id, Model model) {

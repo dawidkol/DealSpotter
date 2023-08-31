@@ -36,8 +36,8 @@ class UserController {
     @GetMapping("/promo/all")
     String userPromos(Model model) {
         List<PromoDto> promos = promoService.findPromosByUsername();
-        model.addAttribute("promos", promos);
-        return "user-promos";
+        model.addAttribute("promoList", promos);
+        return "promo-list";
     }
 
 }

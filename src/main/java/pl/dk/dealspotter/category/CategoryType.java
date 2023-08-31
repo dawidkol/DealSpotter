@@ -1,7 +1,7 @@
 package pl.dk.dealspotter.category;
 
 public enum CategoryType {
-    AllCATEGORY("Wszystkie kategorie"),
+    All("Wszystkie kategorie"),
     ELECTRONICS("Elektronika"),
     FASHION("Moda"),
     HOUSE_AND_GARDEN("Dom i ogród"),

@@ -5,15 +5,16 @@
 <head th:replace="~{fragments::head(title = 'Strona nie istnieje')}">
 <body>
 <nav th:replace="~{fragments::login-navbar}"></nav>
-<div class="container">
-    <div class="confirmation">
-        <i class="fa-regular fa-face-sad-tear fa-10x"></i>
-        <h2>Strona, którą próbujesz odwiedzić nie została odnaleziona.</h2>
+
+<main>
+    <div class="container">
+        <div class="confirmation">
+            <i class="fa-regular fa-face-sad-tear fa-10x"></i>
+            <h2>Strona, którą próbujesz odwiedzić nie została odnaleziona.</h2>
+        </div>
     </div>
+</main>
 
-
-
-</div>
 <footer th:replace="~{fragments::footer}"></footer>
 </body>
 </html>

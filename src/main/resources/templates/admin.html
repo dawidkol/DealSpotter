@@ -4,18 +4,21 @@
 <head th:replace="~{fragments::head(title = 'Panel administratora')}">
 </head>
 <body>
+<main>
+    <nav th:replace="~{fragments::login-navbar}">
+    </nav>
+    <div class="container">
+        <h2 class="list-heading">Panel administratora</h2>
+        <h3 class="list-heading" th:text="|Witaj ${user.firstName}|"></h3>
+        <ul class="list-border">
+            <li sec:authorize="hasRole('ADMIN')"><a href="/admin/promo/all">Lista promocji</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a href="/admin/users/all">Lista użytkowników</a></li>
+            <Li sec:authorize="hasRole('USER')"><a href="/user/promo/all">Twoje ogłoszenia</a></Li>
+            <li><a href="#" th:href="@{/user/change-password}">Zmień hasło</a></li>
+        </ul>
+    </div>
+</main>
 
-<nav th:replace="~{fragments::login-navbar}">
-</nav>
-<div class="container">
-  <h3 th:text="|Witaj ${user.firstName}|"></h3>
-  <ul>
-    <li sec:authorize="hasRole('ADMIN')"><a  href="/admin/promo/all">Lista promocji</a></li>
-    <li sec:authorize="hasRole('ADMIN')"><a  href="/admin/users/all">Lista użytkowników</a></li>
-    <li><a href="#" th:href="@{/user/change-password}">Zmień hasło</a></li>
-  </ul>
-
-</div>
 <footer th:replace="~{fragments::footer}">Footer</footer>
 </body>
 </html>

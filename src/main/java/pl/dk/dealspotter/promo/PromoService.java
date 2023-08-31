@@ -1,7 +1,7 @@
 package pl.dk.dealspotter.promo;
 
 
-import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.dk.dealspotter.user.UserService;
 import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,15 +33,21 @@ public class PromoService {
 
     public List<PromoDto> findAllPromo() {
         List<Promo> list = (List<Promo>) promoRepository.findAll();
+        Collections.reverse(list);
         return list.stream().map(promoDtoMapper::map).toList();
     }
 
     public List<PromoDto> findByCategory(String category) {
-        List<Promo> list = (List<Promo>) promoRepository.findAll();
-        return list.stream().filter(a ->
-                        a.getCategory().getName().equalsIgnoreCase(category))
-                .map(promoDtoMapper::map)
-                .toList();
+        if (category.equalsIgnoreCase("Wszystkie kategorie")) {
+            List<Promo> allPromoList = (List<Promo>) promoRepository.findAll();
+            return allPromoList.stream().map(promoDtoMapper::map).toList();
+        } else {
+            List<Promo> promosByCategory = (List<Promo>) promoRepository.findAll();
+            return promosByCategory.stream().filter(a ->
+                            a.getCategory().getName().equalsIgnoreCase(category))
+                    .map(promoDtoMapper::map)
+                    .toList();
+        }
     }
 
     public List<PromoDto> findByNameAndCategory(String name, String category) {
@@ -99,7 +106,7 @@ public class PromoService {
     @Transactional
     public void deletePromo(Long id) {
         String email = findCurrentUsername();
-        Promo save = promoRepository.findById(id).orElseThrow(EntityExistsException::new);
+        Promo save = promoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         if (isAdmin(email)) {
             promoRepository.deleteById(id);
         } else if (checkIfUserPromo(save, email)) {

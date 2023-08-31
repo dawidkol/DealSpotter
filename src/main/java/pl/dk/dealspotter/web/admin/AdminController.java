@@ -38,8 +38,8 @@ class AdminController {
         List<PromoDto> allPromo = promoService.findAllPromo();
         SavePromoDto savePromoDto = new SavePromoDto();
         model.addAttribute("promo", savePromoDto);
-        model.addAttribute("allPromo", allPromo);
-        return "all-promo-list";
+        model.addAttribute("promoList", allPromo);
+        return "promo-list";
     }
 
 

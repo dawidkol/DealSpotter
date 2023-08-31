@@ -1,13 +1,10 @@
 package pl.dk.dealspotter.file;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -25,6 +22,4 @@ public class FileStorageRepository {
             originalFilename = null;
         }
     }
-
-
 }

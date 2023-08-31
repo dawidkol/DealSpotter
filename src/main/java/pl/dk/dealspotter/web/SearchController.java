@@ -20,8 +20,8 @@ class SearchController {
     @GetMapping("/listing")
     String searchPromo(@RequestParam String string, @RequestParam String category, Model model) {
         List<PromoDto> promoList = promoService.findByNameAndCategory(string, category);
-        model.addAttribute("promoList", promoList);
+        model.addAttribute("list", promoList);
         model.addAttribute("searchString", string);
-        return "search-list";
+        return "index";
     }
 }

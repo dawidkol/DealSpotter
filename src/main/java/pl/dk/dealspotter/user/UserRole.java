@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-class UserRole {
+public class UserRole {
 
 
     @Id

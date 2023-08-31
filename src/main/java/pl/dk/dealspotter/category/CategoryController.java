@@ -26,6 +26,6 @@ class CategoryController {
         List<PromoDto> promoList = promoService.findByCategory(selectCategory);
         model.addAttribute("list", promoList);
         model.addAttribute("category", selectCategory);
-        return "products-by-category";
+        return "index";
     }
 }

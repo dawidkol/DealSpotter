@@ -14,4 +14,15 @@ public class UserDtoMapper {
                 .promo(user.getPromo())
                 .build();
     }
+
+
+
+/*    public User map(UserDto userDto) {
+        return User.builder()
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .email(userDto.getEmail())
+                .promo(userDto.getPromo())
+                .build();
+    }*/
 }

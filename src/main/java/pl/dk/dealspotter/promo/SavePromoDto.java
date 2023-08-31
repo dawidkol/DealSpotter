@@ -3,10 +3,16 @@ package pl.dk.dealspotter.promo;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class SavePromoDto {
     private Long id;
     @NotNull
@@ -23,7 +29,7 @@ public class SavePromoDto {
     private String urlAddress;
     private String category;
     private String imageFilename;
-
+    /*
     public SavePromoDto() {
     }
 
@@ -84,5 +90,5 @@ public class SavePromoDto {
     public void setImageFilename(String imageFilename) {
         this.imageFilename = imageFilename;
     }
-
+*/
 }

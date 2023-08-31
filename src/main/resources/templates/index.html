@@ -16,40 +16,29 @@
 
     <div class="container">
         <article class="discovery" th:each="promo: ${list}" th:object="${promo}">
-            <div >
+            <div>
                 <a href="#" th:href="@{|/promo/*{id}|}">
-                    <img th:src="*{imageFilename ne null} ? @{|/*{imageFilename}|} : @{/empty-image.png}"
+                    <img th:src="${promo.imageFilename ne null} ?  ${promo.imageFilename} : @{/empty-image.png}"
                          alt="tytuł promocji"
                          class="promo-list-item-poster"/>
                 </a>
             </div>
             <section class="description">
-                <a th:href="@{|/promo/*{id}|}">
-                    <h2 class="discovery-header" th:text="*{name}"></h2>
-                </a>
-                <p class="discovery-details" th:text="|Dodane prze: *{userDto.firstName},data dodania: *{#temporals.format(localDateTime, 'dd-MM-yyyy HH:mm')}|">Dodane przez: Mietek, data dodania: 22/01/2015</p>
+                <h2 class="discovery-header" th:text="*{name}"></h2>
+                <p class="discovery-details"
+                   th:text="|Dodane prze: *{userDto.firstName},data dodania: *{#temporals.format(localDateTime, 'dd-MM-yyyy HH:mm')}|">
+                    Dodane przez: Mietek, data dodania: 22/01/2015</p>
                 <a href="#" class="discovery-link" th:href="*{urlAddress}">Idź do okazji</a>
-                <p  th:text="*{description}">cursus in hac habitasse platea dictumst quisque sagittis purus sit amet volutpat
+                <p th:text="*{description}">cursus in hac habitasse platea dictumst quisque sagittis purus sit amet
+                    volutpat
                     consequat mauris nunc congue
                     nisi vitae suscipit tellus mauris a diam maecenas sed enim ut sem viverra aliquet</p>
-                <p class="" th:text="|Cena: *{price}|">Cena</p>
-
-                <section class="discovery-bar">
-                    <a href="#" class="discovery-link upvote">
-                        <i class="fas fa-arrow-alt-circle-up discovery-upvote"></i>
-                    </a>
-                    <p class="discovery-votes">32</p>
-                    <a href="#" class="discovery-link downvote">
-                        <i class="fas fa-arrow-alt-circle-down discovery-downvote"></i>
-                    </a>
-                </section>
+                <p class="price" th:text="|Cena: *{price}| + ' zł'">Cena</p>
             </section>
-
-
         </article>
-
     </div>
+    <footer th:replace="~{fragments::footer}"></footer>
 </main>
-<footer th:replace="~{fragments::footer}"></footer>
+
 </body>
 </html>

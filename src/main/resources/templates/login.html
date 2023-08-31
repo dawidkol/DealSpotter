@@ -5,22 +5,26 @@
 <body>
 <nav th:replace="~{fragments::login-navbar}">
 </nav>
-<div class="form container">
-    <form method="post" action="#" th:action="@{/login}">
-        <h3>Panel logowania</h3>
-        <label for="username">
-            Użytkownik
-            <input name="username" type="email" id="username" placeholder="Email" required>
-        </label>
-        <label for="password">
-            Hasło:
-            <input name="password" type="password" id="password" placeholder="Hasło" required>
-        </label>
+<main>
+    <div class="form container">
+        <form method="post" action="#" th:action="@{/login}">
+            <h3>Panel logowania</h3>
+            <label for="username">
+                Użytkownik
+                <input name="username" type="email" id="username" placeholder="Email" required>
+            </label>
+            <label for="password">
+                Hasło:
+                <input name="password" type="password" id="password" placeholder="Hasło" required>
+            </label>
 
-        <button type="submit">Zaloguj</button>
-        <a href="#" th:href="@{/register}" >Nie masz jeszcze konta? Zarejestruj się</a>
-    </form>
-</div>
+            <button type="submit">Zaloguj</button>
+            <a href="#" th:href="@{/register}">Nie masz jeszcze konta? Zarejestruj się</a>
+        </form>
+    </div>
+</main>
+
+
 <footer th:replace="~{fragments::footer}">
 </footer>
 

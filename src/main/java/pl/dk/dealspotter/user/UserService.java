@@ -1,5 +1,6 @@
 package pl.dk.dealspotter.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,8 +9,8 @@ import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 import pl.dk.dealspotter.user.dto.UserDto;
 import pl.dk.dealspotter.user.dto.UserRegistrationDto;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -39,16 +40,18 @@ public class UserService {
 
     @Transactional
     public void register(UserRegistrationDto userRegistrationDto) {
-        User user = new User();
-        user.setFirstName(userRegistrationDto.getFirstName());
-        user.setLastName(userRegistrationDto.getLastName());
-        user.setEmail(userRegistrationDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
+        User user = User.builder()
+                .firstName(userRegistrationDto.getFirstName())
+                .lastName(userRegistrationDto.getLastName())
+                .email(userRegistrationDto.getEmail())
+                .password(passwordEncoder.encode(userRegistrationDto.getPassword()))
+                .roles(new HashSet<>())
+                .build();
+
         userRoleRepository.findByName(USER_ROLE).ifPresentOrElse(role -> user.getRoles().add(role),
                 () -> {
-                    throw new NoSuchElementException();
-                }
-        );
+                    throw new EntityNotFoundException();
+                });
         userRepository.save(user);
 
     }
@@ -56,7 +59,7 @@ public class UserService {
     @Transactional
     public void changeUserPassword(String newPassword) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentUsername).orElseThrow();
+        User currentUser = userRepository.findByEmail(currentUsername).orElseThrow(UserNotFoundException::new);
         String newPasswordHash = passwordEncoder.encode(newPassword);
         currentUser.setPassword(newPasswordHash);
 
@@ -68,28 +71,29 @@ public class UserService {
 
     public List<UserDto> findAllUsers() {
         if (checkAuthority()) {
-            List<UserDto> users = ((List<User>) (userRepository.findAll()))
+            return ((List<User>) (userRepository.findAll()))
                     .stream()
                     .filter(user -> user.getRoles().stream().allMatch(x -> x.getName().equalsIgnoreCase(USER_ROLE)))
                     .map(userDtoMapper::map)
                     .toList();
-            return users;
+        } else {
+            throw new SecurityException("Brak uprawnień do strony");
         }
-        throw new SecurityException("Brak uprawnień do strony");
+
     }
 
     @Transactional
-    public void deleteUser(String username) {
+    public void deleteUser(String email) {
         if (checkAuthority()) {
-            Long id = userRepository.findByEmail(username).orElseThrow(NoSuchElementException::new).getId();
+            Long id = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new).getId();
             userRepository.deleteById(id);
         }
     }
 
-    public boolean checkAuthority() {
+    private boolean checkAuthority() {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserCredentialsDto userCredentialsDto = findCredentialsByEmail(name).orElseThrow(NoSuchElementException::new);
-        return userCredentialsDto.getRoles().stream().anyMatch(x -> x.equalsIgnoreCase(ADMIN_AUTHORITY) || x.equalsIgnoreCase(USER_ROLE));
+        UserCredentialsDto userCredentialsDto = findCredentialsByEmail(name).orElseThrow(UserNotFoundException::new);
+        return userCredentialsDto.getRoles().stream().anyMatch(x -> x.equalsIgnoreCase(ADMIN_AUTHORITY) /*|| x.equalsIgnoreCase(USER_ROLE)*/);
     }
 
 }

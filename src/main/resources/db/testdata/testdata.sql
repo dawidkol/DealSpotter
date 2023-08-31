@@ -63,7 +63,7 @@ INSERT INTO
     application_user(first_name, last_name, email, password)
 VALUES
     ('admin', 'admin', 'admin@admin.pl', '{noop}admin' ),
-    ('Mateusz', 'Kowalski', 'mateusz.kowalski@abc.pl', '{noop}simplePass'),
+    ('Mateusz', 'Kowalski', 'mateusz.kowalski@abc.pl', '{noop}simplePass'), /*{bcrypt}$2a$10$lSLZwvrUNSbA/mz9QyXDNOnmt2B/uXurC1ZTTBvrdvAyXzi9MwU5i*/
     ('Stefan', 'Zabłocki', 'stefan.zablocki@abc.pl', '{noop}simplePass');
 
 INSERT INTO
