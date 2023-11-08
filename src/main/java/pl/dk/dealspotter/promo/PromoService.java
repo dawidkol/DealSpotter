@@ -3,10 +3,13 @@ package pl.dk.dealspotter.promo;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import pl.dk.dealspotter.promo.dto.PromoDto;
+import pl.dk.dealspotter.promo.dto.SavePromoDto;
 import pl.dk.dealspotter.user.UserService;
 import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 
@@ -16,20 +19,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PromoService {
 
     private final PromoRepository promoRepository;
     private final PromoDtoMapper promoDtoMapper;
     private final UserService userService;
-
-
-
-    public PromoService(PromoRepository promoRepository, PromoDtoMapper promoDtoMapper, UserService userService) {
-        this.promoRepository = promoRepository;
-        this.promoDtoMapper = promoDtoMapper;
-        this.userService = userService;
-    }
-
 
     public List<PromoDto> findAllPromo() {
         List<Promo> list = (List<Promo>) promoRepository.findAll();
@@ -53,14 +48,15 @@ public class PromoService {
     public List<PromoDto> findByNameAndCategory(String name, String category) {
         List<Promo> list = (List<Promo>) promoRepository.findAll();
         if (category.equals("Wszystkie kategorie")) {
-            return list.stream().filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
+            return list.stream()
+                    .filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
                     .map(promoDtoMapper::map)
                     .toList();
         }
         return list.stream()
                 .filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
                 .filter(a -> a.getCategory().getName().equalsIgnoreCase(category))
-                .map(promoDtoMapper::map) 
+                .map(promoDtoMapper::map)
                 .toList();
     }
 
@@ -135,8 +131,8 @@ public class PromoService {
                 .stream()
                 .map(Promo::getId)
                 .anyMatch(id -> Objects.equals(id, promo.getId()));
-
     }
+
     private static String findCurrentUsername() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }

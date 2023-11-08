@@ -12,7 +12,6 @@ import pl.dk.dealspotter.user.UserService;
 class ChangePasswordController {
 
     private final UserService userService;
-
     public ChangePasswordController(UserService userService) {
         this.userService = userService;
     }

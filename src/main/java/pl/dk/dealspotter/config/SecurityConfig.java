@@ -1,6 +1,5 @@
 package pl.dk.dealspotter.config;
 
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,12 +11,16 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 class SecurityConfig {
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request -> request
+                .requestMatchers("/styles/**").permitAll()
+                .requestMatchers("/img/**").permitAll()
+                .requestMatchers("/").permitAll()
                 .requestMatchers("/admin/**")
                 .hasRole("ADMIN")
-                .requestMatchers("/user/**","/promo/save/**", "/promo/edit/**", "/promo/update/**", "/promo/delete/*")
+                .requestMatchers("/user/**", "/promo/save/**", "/promo/edit/**", "/promo/update/**", "/promo/delete/*")
                 .hasAnyRole("USER", "ADMIN")
                 .anyRequest()
                 .permitAll());
@@ -26,9 +29,10 @@ class SecurityConfig {
         httpSecurity.logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout/**", HttpMethod.GET.name()))
                 .logoutSuccessUrl("/")
+
         );
-        httpSecurity.csrf(csrf -> csrf.ignoringRequestMatchers(PathRequest.toH2Console()));
         httpSecurity.headers().frameOptions().sameOrigin();
+
         return httpSecurity.build();
     }
 
@@ -36,11 +40,5 @@ class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-
-
-
-
-
-
 
 }

@@ -51,6 +51,4 @@ public class Promo {
     private LocalDateTime localDateTime;
 
 
-
-
 }

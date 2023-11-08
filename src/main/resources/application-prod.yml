@@ -1,24 +1,41 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/dealspotter
+    url: jdbc:mysql://database:3306/dealspotter?useSSL=false&serverTimezone=Europe/Warsaw
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
+    username: admin
+    password: password
   liquibase:
     change-log: classpath:/db/changelog/master.xml
     clear-checksums: true
     contexts: prod
+    enabled: true
+    url: jdbc:mysql://database:3306/dealspotter
+    user: admin
+    password: password
+    drop-first: true
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
   servlet:
     multipart:
       max-file-size: -1
-
   web:
     resources:
-      static-locations: classpath:/static/,file:/Users/dawid/uploads/
+      static-locations: classpath:/static/,file:./uploads/
+  h2:
+    console:
+      enabled: off
+  docker:
+    compose:
+      enabled: true
+  devtools:
+    livereload:
+      enabled: false
 app:
   storage:
-    location: /Users/dawid/uploads/
+    location: ./uploads/
+server:
+  port: 8080
+
 

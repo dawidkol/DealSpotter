@@ -1,5 +1,8 @@
 package pl.dk.dealspotter.category;
 
+import lombok.Getter;
+
+@Getter
 public enum CategoryType {
     All("Wszystkie kategorie"),
     ELECTRONICS("Elektronika"),
@@ -15,19 +18,9 @@ public enum CategoryType {
     REAL_ESTATE("Nieruchomości"),
     OTHER("Inne");
 
-
-
     private String description;
 
     CategoryType(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
     }
 }

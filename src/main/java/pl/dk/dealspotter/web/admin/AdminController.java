@@ -6,9 +6,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import pl.dk.dealspotter.promo.PromoDto;
+import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.PromoService;
-import pl.dk.dealspotter.promo.SavePromoDto;
+import pl.dk.dealspotter.promo.dto.SavePromoDto;
 import pl.dk.dealspotter.user.UserService;
 import pl.dk.dealspotter.user.dto.UserDto;
 
@@ -17,7 +17,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 class AdminController {
-
     private final PromoService promoService;
     private final UserService userService;
 
@@ -57,12 +56,8 @@ class AdminController {
     }
 
     @GetMapping("/user/delete/{username}")
-    String deleteUser(@PathVariable String username ){
+    String deleteUser(@PathVariable String username) {
         userService.deleteUser(username);
         return "redirect:/admin/users/all";
     }
-
-
-
-
 }

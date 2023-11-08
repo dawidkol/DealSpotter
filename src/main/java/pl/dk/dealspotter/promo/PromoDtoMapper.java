@@ -5,6 +5,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.dk.dealspotter.category.Category;
 import pl.dk.dealspotter.category.CategoryRepository;
+import pl.dk.dealspotter.promo.dto.PromoDto;
+import pl.dk.dealspotter.promo.dto.SavePromoDto;
 import pl.dk.dealspotter.user.User;
 import pl.dk.dealspotter.user.UserDtoMapper;
 import pl.dk.dealspotter.user.UserRepository;
@@ -66,7 +68,7 @@ class PromoDtoMapper {
         return userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(NoSuchElementException::new);
     }
 
-    private String setImage (SavePromoDto savePromoDto) {
+    private String setImage(SavePromoDto savePromoDto) {
         if (savePromoDto.getImageFilename().isEmpty()) {
             savePromoDto.setImageFilename("empty-image.png");
             return savePromoDto.getImageFilename();

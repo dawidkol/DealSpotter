@@ -1,5 +1,6 @@
 package pl.dk.dealspotter.config;
 
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,12 +10,9 @@ import pl.dk.dealspotter.user.UserService;
 import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 
 @Service
-class CustomUserDetailsService implements UserDetailsService {
+@AllArgsConstructor
+class UserDetailsServiceImplementation implements UserDetailsService {
     private final UserService userService;
-
-    public CustomUserDetailsService(UserService userService) {
-        this.userService = userService;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

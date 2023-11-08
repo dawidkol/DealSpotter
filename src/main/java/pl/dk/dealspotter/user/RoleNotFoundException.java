@@ -4,10 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-class UserNotFoundException extends RuntimeException {
-    private static final String MESSAGE = "Użytkownik nie został odnaleziony";
+class RoleNotFoundException extends RuntimeException {
+    private static final String MESSAGE = "Podana rola użytkownika nie została odnaleziona";
 
-    public UserNotFoundException() {
+    public RoleNotFoundException() {
         super(MESSAGE);
     }
 }

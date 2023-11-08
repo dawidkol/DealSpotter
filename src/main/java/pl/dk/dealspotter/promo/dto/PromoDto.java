@@ -1,4 +1,4 @@
-package pl.dk.dealspotter.promo;
+package pl.dk.dealspotter.promo.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -21,5 +21,4 @@ public class PromoDto {
     private String imageFilename;
     private UserDto userDto;
     private LocalDateTime localDateTime;
-
 }

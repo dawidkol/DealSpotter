@@ -1,5 +1,5 @@
 INSERT INTO category
-(name)
+    (name)
 VALUES ('Wszystkie kategorie'),
        ('Elektronika'),
        ('Moda'),

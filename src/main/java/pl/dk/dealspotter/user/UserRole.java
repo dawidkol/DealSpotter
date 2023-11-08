@@ -13,8 +13,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserRole {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,6 +22,4 @@ public class UserRole {
     @NotNull
     @Size(min = 3)
     private String description;
-
-
 }

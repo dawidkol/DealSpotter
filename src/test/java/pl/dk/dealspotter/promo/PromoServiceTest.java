@@ -7,6 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import pl.dk.dealspotter.promo.dto.PromoDto;
+import pl.dk.dealspotter.promo.dto.SavePromoDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("dev")
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Log4j2
 class PromoServiceTest {
@@ -157,13 +158,11 @@ class PromoServiceTest {
 
         //when
         promoService.updatePromo(promoToUpdate);
-        PromoDto updatedPromo = promoService.getPromoById(2l).orElseThrow();
+        PromoDto updatedPromo = promoService.getPromoById(2L).orElseThrow();
 
         //then
         assertAll(
                 () -> assertTrue(updatedPromo.getName().equalsIgnoreCase(newPromoName))
         );
-
-
     }
 }

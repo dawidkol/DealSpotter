@@ -2,19 +2,35 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/master.xml
     contexts: dev
+    drop-first: true
   datasource:
+    driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test
+    username: admin
+    password: password
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
   servlet:
     multipart:
       max-file-size: -1
   web:
     resources:
       static-locations: classpath:/static/,file:./uploads/
+  docker:
+    compose:
+      enabled: false
+  h2:
+    console:
+      enabled: false
+  config:
+    activate:
+      on-profile: dev
+  devtools:
+    livereload:
+      enabled: true
 app:
   storage:
     location: ./uploads/
-
-
+server:
+  port: 8080

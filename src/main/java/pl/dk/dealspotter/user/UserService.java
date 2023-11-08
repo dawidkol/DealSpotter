@@ -1,7 +1,7 @@
 package pl.dk.dealspotter.user;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private static final String USER_ROLE = "USER";
     private static final String ADMIN_AUTHORITY = "ADMIN";
@@ -22,16 +23,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserCredentialsDtoMapper userCredentialsDtoMapper;
     private final UserDtoMapper userDtoMapper;
-
-
-    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder, UserCredentialsDtoMapper userCredentialsDtoMapper, UserDtoMapper userDtoMapper) {
-        this.userRepository = userRepository;
-        this.userRoleRepository = userRoleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userCredentialsDtoMapper = userCredentialsDtoMapper;
-        this.userDtoMapper = userDtoMapper;
-
-    }
 
     public Optional<UserCredentialsDto> findCredentialsByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -50,7 +41,7 @@ public class UserService {
 
         userRoleRepository.findByName(USER_ROLE).ifPresentOrElse(role -> user.getRoles().add(role),
                 () -> {
-                    throw new EntityNotFoundException();
+                    throw new RoleNotFoundException();
                 });
         userRepository.save(user);
 
@@ -59,10 +50,10 @@ public class UserService {
     @Transactional
     public void changeUserPassword(String newPassword) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentUsername).orElseThrow(UserNotFoundException::new);
+        User currentUser = userRepository.findByEmail(currentUsername)
+                .orElseThrow(UserNotFoundException::new);
         String newPasswordHash = passwordEncoder.encode(newPassword);
         currentUser.setPassword(newPasswordHash);
-
     }
 
     public Optional<UserDto> findUsername(String email) {
@@ -79,14 +70,16 @@ public class UserService {
         } else {
             throw new SecurityException("Brak uprawnień do strony");
         }
-
     }
 
-    @Transactional
     public void deleteUser(String email) {
         if (checkAuthority()) {
-            Long id = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new).getId();
+            Long id = userRepository.findByEmail(email)
+                    .orElseThrow(UserNotFoundException::new)
+                    .getId();
             userRepository.deleteById(id);
+        } else {
+            throw new SecurityException();
         }
     }
 
@@ -95,5 +88,4 @@ public class UserService {
         UserCredentialsDto userCredentialsDto = findCredentialsByEmail(name).orElseThrow(UserNotFoundException::new);
         return userCredentialsDto.getRoles().stream().anyMatch(x -> x.equalsIgnoreCase(ADMIN_AUTHORITY) /*|| x.equalsIgnoreCase(USER_ROLE)*/);
     }
-
 }

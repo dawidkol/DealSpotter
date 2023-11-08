@@ -22,9 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("dev")
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-//@AutoConfigureMockMvc(addFilters = false)
 @Log4j2
 class UserServiceTest {
 
@@ -39,6 +37,7 @@ class UserServiceTest {
     void init() {
 
     }
+
     @Test
     void shouldRegisterUser() {
         UserRegistrationDto userToRegister = UserRegistrationDto.builder()
@@ -125,7 +124,7 @@ class UserServiceTest {
         String newEncodedPassword = user.orElseThrow().getPassword();
 
         //then
-        Assertions.assertTrue(passwordEncoder.matches(newPassword,newEncodedPassword));
+        Assertions.assertTrue(passwordEncoder.matches(newPassword, newEncodedPassword));
     }
 
 }

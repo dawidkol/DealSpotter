@@ -13,11 +13,10 @@
             <span th:text="${categoryType.description}">Nieruchomości</span>
         </a>
     </div>
-
     <div class="container">
         <article class="discovery" th:each="promo: ${list}" th:object="${promo}">
             <div>
-                <a href="#" th:href="@{|/promo/*{id}|}">
+                <a>
                     <img th:src="${promo.imageFilename ne null} ?  ${promo.imageFilename} : @{/empty-image.png}"
                          alt="tytuł promocji"
                          class="promo-list-item-poster"/>

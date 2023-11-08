@@ -189,7 +189,8 @@ div a span {
     border-radius: 5px;
     cursor: pointer;
 }
- input::file-selector-button {
+
+input::file-selector-button {
 
     border: #080710;
     border-radius: 3px;
@@ -225,9 +226,9 @@ div a span {
     width: 600px;
     background-color: rgba(255, 255, 255, 0.13);
     position: absolute;
-    margin-left: 25%;
-    margin-right: 25%;
-    margin-top: 5%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     border-radius: 10px;
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 255, 255, 0.1);
@@ -235,6 +236,7 @@ div a span {
     padding: 40px 35px;
     background-color: lightgray;
 }
+
 form .form-description {
     height: 150px;
     width: 100%;
@@ -279,12 +281,6 @@ form .form-description {
     align-items: center;
     font-size: 1.2rem;
 }
-
-/*!* zmieniamy paragraf na element liniowy *!
-.discovery-votes {
-    display: inline;
-    color: #007AFF;
-}*/
 
 /* nadpisanie domyślnych marginesów */
 .discovery-bar > p {

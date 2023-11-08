@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import pl.dk.dealspotter.promo.PromoDto;
+import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.PromoService;
 
 import java.util.List;

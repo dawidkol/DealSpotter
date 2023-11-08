@@ -7,7 +7,6 @@ import pl.dk.dealspotter.promo.Promo;
 import java.util.List;
 
 
-
 @Builder
 @Getter
 public class UserDto {

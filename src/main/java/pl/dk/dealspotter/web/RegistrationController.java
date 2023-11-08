@@ -2,7 +2,6 @@ package pl.dk.dealspotter.web;
 
 
 import jakarta.validation.Valid;
-import jakarta.validation.Validator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,11 +14,9 @@ import pl.dk.dealspotter.user.dto.UserRegistrationDto;
 @Controller
 class RegistrationController {
     private final UserService userService;
-    private final Validator validator;
 
-    public RegistrationController(UserService userService, Validator validator) {
+    public RegistrationController(UserService userService) {
         this.userService = userService;
-        this.validator = validator;
     }
 
     @GetMapping("/register")
