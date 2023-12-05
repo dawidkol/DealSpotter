@@ -1,0 +1,21 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      jakarta:
+        persistence:
+          validation:
+            mode: none #disabling validation in test class
+  liquibase:
+    enabled: false
+  security:
+    user:
+      name: john@rambo.com
+      roles: ADMIN
+      password:
+
+
+
+
+

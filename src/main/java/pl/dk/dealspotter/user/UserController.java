@@ -5,8 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.PromoService;
+import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.user.dto.UserDto;
 
 import java.util.List;
@@ -24,7 +24,7 @@ class UserController {
 
     @GetMapping("")
     String username(Authentication authentication, Model model) {
-        UserDto user = userService.findUsername(authentication.getName()).orElseThrow(SecurityException::new);
+        UserDto user = userService.findUser(authentication.getName()).orElseThrow(SecurityException::new);
         model.addAttribute("user", user);
         return "user";
     }

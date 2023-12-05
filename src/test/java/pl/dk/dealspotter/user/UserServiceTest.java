@@ -1,130 +1,314 @@
 package pl.dk.dealspotter.user;
 
-
-import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
+import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 import pl.dk.dealspotter.user.dto.UserDto;
 import pl.dk.dealspotter.user.dto.UserRegistrationDto;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@ActiveProfiles("dev")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@Log4j2
+
 class UserServiceTest {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
+    @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserRoleRepository userRoleRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    private UserCredentialsDtoMapper userCredentialsDtoMapper;
+    private UserDtoMapper userDtoMapper;
+    private UserService underTest;
+
+    @Captor
+    ArgumentCaptor<User> userCaptor;
 
     @BeforeEach
-    void init() {
-
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        userCredentialsDtoMapper = new UserCredentialsDtoMapper();
+        userDtoMapper = new UserDtoMapper();
+        underTest = new UserService(userRepository, userRoleRepository, passwordEncoder, userCredentialsDtoMapper, userDtoMapper);
     }
 
     @Test
-    void shouldRegisterUser() {
-        UserRegistrationDto userToRegister = UserRegistrationDto.builder()
-                .firstName("Mariusz")
-                .lastName("Kamiński")
-                .email("m.kaminski@gmail.com")
-                .password("simplePass")
+    void itShouldRegisterUser() {
+        // Given
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
                 .build();
 
-        userService.register(userToRegister);
+        UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("bloodyjohn@test.pl")
+                .password("rambo123")
+                .build();
 
-        Optional<UserDto> userInDb = userService.findUsername("m.kaminski@gmail.com");
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("bloodyjohn@test.pl")
+                .password("rambo123")
+                .roles(Set.of(userRole))
+                .build();
 
+
+        // When
+        when(userRoleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
+        when(passwordEncoder.encode(userRegistrationDto.getPassword())).thenReturn("rambo123");
+
+        underTest.register(userRegistrationDto);
+
+        Mockito.verify(userRepository).save(userCaptor.capture());
+        Mockito.verify(userRoleRepository).findByName("USER");
+
+        // Then
         assertAll(
-                () -> assertThat(userInDb.orElseThrow().getFirstName()).isEqualTo("Mariusz"),
-                () -> assertThat(userInDb.orElseThrow().getLastName()).isEqualTo("Kamiński"),
-                () -> assertThat(userInDb.orElseThrow().getEmail()).isEqualTo("m.kaminski@gmail.com")
+                () -> assertThat(user).isEqualTo(userCaptor.getValue())
         );
     }
 
     @Test
-    void shouldFindUserByEmail() {
-        //('Mateusz', 'Kowalski', 'mateusz.kowalski@abc.pl', '{noop}simplePass')
-        //given
-        String userEmail = "mateusz.kowalski@abc.pl";
 
-        //when
-        Optional<UserDto> username = userService.findUsername(userEmail);
+    void itShouldThrowRoleNotFoundException() {
+        // Given
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
+                .build();
 
-        //then
+        UserRegistrationDto userRegistrationDto = UserRegistrationDto.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("bloodyjohn@test.pl")
+                .password("rambo123")
+                .build();
+
+        // When
+        when(userRoleRepository.findByName("USER")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(userRegistrationDto.getPassword())).thenReturn("rambo123");
+
+        // Then
         assertAll(
-                () -> assertThat(username.orElseThrow().getFirstName()).isEqualTo("Mateusz"),
-                () -> assertThat(username.orElseThrow().getLastName()).isEqualTo("Kowalski"),
-                () -> assertThat(username.orElseThrow().getEmail()).isEqualTo("mateusz.kowalski@abc.pl")
+                () -> assertThrows(RoleNotFoundException.class, () -> underTest.register(userRegistrationDto)),
+                () -> Mockito.verify(userRoleRepository).findByName("USER"),
+                () -> Mockito.verify(passwordEncoder).encode(userRegistrationDto.getPassword())
         );
     }
 
     @Test
-    @WithMockUser(username = "admin@admin.pl", password = "admin")
-    void shouldDeleteUserWithUserWhoHasAdminRole() {
-        //given
-        String userEmail = "mateusz.kowalski@abc.pl";
+    void itShouldFindCredentialsByGivenEmail() {
+        // Given
+        String email = "john@rambo.com";
 
-        //when
-        userService.deleteUser(userEmail);
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
+                .build();
 
-        //then
-        assertThat(userService.findUsername(userEmail)).isEmpty();
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("rambo123")
+                .roles(Set.of(userRole))
+                .build();
 
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        // When
+        UserCredentialsDto userCredentialsDto = userCredentialsDtoMapper.userCredentialsDto(user);
+        Optional<UserCredentialsDto> optionalUserCredentialsDto = underTest.findCredentialsByEmail(email);
+
+
+        // Then
+        assertAll(
+                () -> Mockito.verify(userRepository).findByEmail(email),
+                () -> assertThat(userCredentialsDto).isInstanceOf(UserCredentialsDto.class),
+                () -> assertThat(optionalUserCredentialsDto).isPresent()
+                        .hasValueSatisfying(c ->
+                                assertThat(c).isEqualTo(userCredentialsDto)
+                        ));
     }
 
     @Test
-    @WithMockUser(username = "admin@admin.pl", password = "admin")
-    void shouldFindAllUserWithUserWhoHasAdminRole() {
-        //given when
-        List<UserDto> allUsers = userService.findAllUsers();
+    void itShouldChangeUserPassword() {
+        // Given
+        String newPassword = "newPassword";
+        String email = "john@rambo.com";
 
-        assertThat(allUsers).hasSize(2);
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
+                .build();
+
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of(userRole))
+                .build();
+
+        UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .roles(String.valueOf(user.getRoles()))
+                .build();
+
+
+        // set security context holder
+        SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        emptyContext.setAuthentication(usernamePasswordAuthenticationToken);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(newPassword)).thenReturn(newPassword);
+
+        // When
+        String currentUsername = emptyContext.getAuthentication().getName();
+        underTest.changeUserPassword(newPassword, currentUsername);
+        String changedPassword = user.getPassword();
+
+        // Then
+
+        assertAll (
+                () -> verify(userRepository).findByEmail(email),
+                () -> verify(passwordEncoder).encode(newPassword),
+                () -> assertThat(user.getEmail()).isEqualTo(email),
+                () -> assertThat(changedPassword).isEqualTo(newPassword)
+        );
     }
 
     @Test
-    @WithMockUser(username = "mateusz.kowalski@abc.pl", password = "simplePass")
-    void shouldThrowSecurityException() {
-        SecurityException securityException = assertThrows(SecurityException.class, () -> {
-            userService.findAllUsers();
-        });
+    void itShouldFindUsernameByGivenEmail() {
+        // Given
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
+                .build();
 
-        String message = securityException.getMessage();
-        String expectedMessage = "Brak uprawnień do strony";
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("john@rambo.com")
+                .password("currentPassword")
+                .roles(Set.of(userRole))
+                .build();
 
-        assertTrue(message.contains(expectedMessage));
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
+        // When
+        Optional<UserDto> optionalUsername = underTest.findUser(user.getEmail());
+
+        // Then
+        assertAll(
+                () -> verify(userRepository).findByEmail(user.getEmail()),
+                () -> assertThat(optionalUsername).hasValueSatisfying(
+                                u ->  {
+                                    assertThat(u.getFirstName()).isEqualTo(user.getFirstName());
+                                    assertThat(u.getLastName()).isEqualTo(user.getLastName());
+                                    assertThat(u.getEmail()).isEqualTo(user.getEmail());
+                                }
+                )
+        );
     }
 
     @Test
-    @WithMockUser(username = "admin@admin.pl", password = "admin")
-    void shouldChangeAdminPassword() {
-        //given
-        String newPassword = "newHardPass";
+    void itShouldFindAllUsersWhenUserHasAdminRole() {
+        // Given
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
+                .build();
 
-        //when
-        userService.changeUserPassword(newPassword);
-        Optional<User> user = userRepository.findByEmail("admin@admin.pl");
-        String newEncodedPassword = user.orElseThrow().getPassword();
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("john@rambo.com")
+                .password("currentPassword")
+                .roles(Set.of(userRole))
+                .build();
+        when(userRepository.findAll()).thenReturn(List.of(user));
 
-        //then
-        Assertions.assertTrue(passwordEncoder.matches(newPassword, newEncodedPassword));
+        // When
+        List<UserDto> allUsers = underTest.findAllUsers();
+        // Then
+        assertAll (
+                () -> verify(userRepository).findAll(),
+                () -> assertThat(allUsers.size()).isEqualTo(1),
+                () -> assertThat(allUsers).isNotNull(),
+                () -> assertThat(allUsers).isNotEmpty(),
+                () -> assertThat(allUsers.get(0)).isInstanceOf(UserDto.class)
+        );
     }
 
+    @Test
+    void itShouldDeleteCurrentUser() {
+        // Given
+        Long id = 1L;
+        String email = "john@rambo.com";
+
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
+                .build();
+
+        User user = User.builder()
+                .id(id)
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of(userRole))
+                .build();
+
+        UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .roles(String.valueOf(user.getRoles()))
+                .build();
+
+
+        // set security context holder
+        SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        emptyContext.setAuthentication(usernamePasswordAuthenticationToken);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        // When
+        underTest.deleteUser(email);
+
+        ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+        // Then
+        assertAll(
+                () -> verify(userRepository).findByEmail(argumentCaptor.capture()),
+                () -> verify(userRepository, times(1)).deleteById(id)
+        );
+    }
 }

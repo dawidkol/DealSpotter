@@ -2,7 +2,6 @@ package pl.dk.dealspotter.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.dk.dealspotter.user.dto.UserCredentialsDto;
@@ -17,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private static final String USER_ROLE = "USER";
-    private static final String ADMIN_AUTHORITY = "ADMIN";
+
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -44,48 +43,34 @@ public class UserService {
                     throw new RoleNotFoundException();
                 });
         userRepository.save(user);
-
     }
 
     @Transactional
-    public void changeUserPassword(String newPassword) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+    public void changeUserPassword(String newPassword, String currentUsername) {
         User currentUser = userRepository.findByEmail(currentUsername)
                 .orElseThrow(UserNotFoundException::new);
         String newPasswordHash = passwordEncoder.encode(newPassword);
         currentUser.setPassword(newPasswordHash);
     }
 
-    public Optional<UserDto> findUsername(String email) {
+    public Optional<UserDto> findUser(String email) {
         return userRepository.findByEmail(email).map(userDtoMapper::map);
     }
 
     public List<UserDto> findAllUsers() {
-        if (checkAuthority()) {
-            return ((List<User>) (userRepository.findAll()))
-                    .stream()
-                    .filter(user -> user.getRoles().stream().allMatch(x -> x.getName().equalsIgnoreCase(USER_ROLE)))
-                    .map(userDtoMapper::map)
-                    .toList();
-        } else {
-            throw new SecurityException("Brak uprawnień do strony");
-        }
+        return ((List<User>) (userRepository.findAll()))
+                .stream()
+                .filter(user -> user.getRoles().stream().allMatch(x -> x.getName().equalsIgnoreCase(USER_ROLE)))
+                .map(userDtoMapper::map)
+                .toList();
     }
 
     public void deleteUser(String email) {
-        if (checkAuthority()) {
-            Long id = userRepository.findByEmail(email)
-                    .orElseThrow(UserNotFoundException::new)
-                    .getId();
-            userRepository.deleteById(id);
-        } else {
-            throw new SecurityException();
-        }
+        Long id = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new)
+                .getId();
+        userRepository.deleteById(id);
+
     }
 
-    private boolean checkAuthority() {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserCredentialsDto userCredentialsDto = findCredentialsByEmail(name).orElseThrow(UserNotFoundException::new);
-        return userCredentialsDto.getRoles().stream().anyMatch(x -> x.equalsIgnoreCase(ADMIN_AUTHORITY) /*|| x.equalsIgnoreCase(USER_ROLE)*/);
-    }
 }

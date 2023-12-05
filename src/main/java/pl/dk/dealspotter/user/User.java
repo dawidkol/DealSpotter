@@ -19,6 +19,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
+@ToString
 public class User {
 
     @Id

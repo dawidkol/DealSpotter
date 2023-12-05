@@ -3,15 +3,17 @@ package pl.dk.dealspotter.user;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "user_role")
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class UserRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

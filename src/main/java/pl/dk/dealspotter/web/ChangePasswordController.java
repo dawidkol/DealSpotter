@@ -1,5 +1,6 @@
 package pl.dk.dealspotter.web;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,8 @@ class ChangePasswordController {
 
     @PostMapping("/change-password")
     String changePassword(@RequestParam String newPassword) {
-        userService.changeUserPassword(newPassword);
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        userService.changeUserPassword(newPassword, currentUsername);
         return "redirect:/logout";
     }
 }
