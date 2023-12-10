@@ -7,15 +7,19 @@ spring:
         persistence:
           validation:
             mode: none #disabling validation in test class
+      hibernate:
+        show_sql: true
+        format_sql: true
   liquibase:
     enabled: false
-  security:
-    user:
-      name: john@rambo.com
-      roles: ADMIN
-      password:
-
-
+    change-log: classpath:/db/changelog/master-test.xml
+logging:
+  level:
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            bind: TRACE
 
 
 

@@ -1,168 +1,617 @@
 package pl.dk.dealspotter.promo;
 
-import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.server.ResponseStatusException;
+import pl.dk.dealspotter.category.Category;
+import pl.dk.dealspotter.category.CategoryType;
 import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.dto.SavePromoDto;
+import pl.dk.dealspotter.user.User;
+import pl.dk.dealspotter.user.UserRole;
+import pl.dk.dealspotter.user.UserService;
+import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@ActiveProfiles("dev")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@Log4j2
 class PromoServiceTest {
+    @Mock
+    private PromoRepository promoRepository;
+    @Mock
+    private UserService userService;
+    @Mock
+    private PromoDtoMapper promoDtoMapper;
+    private PromoService underTest;
 
-    @Autowired
-    private PromoService promoService;
-
-    @Test
-    void shouldFindSixPromos() {
-        //given when
-        List<PromoDto> allPromo = promoService.findAllPromo();
-
-        int currentSize = allPromo.size();
-        int expectedSize = 6;
-
-        //then
-        assertThat(currentSize).isEqualTo(expectedSize);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        underTest = new PromoService(promoRepository, promoDtoMapper, userService);
     }
 
     @Test
-    void shouldFindPromosByGivenCategoryName() {
-        //given
+    void itShouldFindAllPromos() {
+        // Given
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("john@rambo.com")
+                .password("rambo123")
+                .roles(Collections.emptySet())
+                .promo(Collections.emptyList())
+                .build();
+
+        Promo promo1 = Promo.builder()
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .build();
+
+        Promo promo2 = Promo.builder()
+                .user(user)
+                .name("testPromo2")
+                .description("best promo you ever saw 2")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now())
+                .build();
+
+        List<Promo> returnList = new ArrayList<>();
+        returnList.add(promo1);
+        returnList.add(promo2);
+
+        when(promoRepository.findAllPromosOrderByDateDescending()).thenReturn(returnList);
+
+        // When
+        List<PromoDto> allPromo = underTest.findAllPromo();
+
+        // Then
+        assertAll(
+                () -> assertThat(allPromo).hasSize(2)
+        );
+    }
+
+    @Test
+    void itShouldFindPromoByGivenCategoryName() {
+        // Given
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("john@rambo.com")
+                .password("rambo123")
+                .roles(Collections.emptySet())
+                .promo(Collections.emptyList())
+                .build();
         String categoryName = "Elektronika";
 
-        //when
-        List<String> categoryList = promoService.findByCategory(categoryName).stream().map(PromoDto::getCategory).toList();
+        Category category = Category.builder()
+                .id(1L)
+                .name(categoryName)
+                .promoList(Collections.emptyList())
+                .build();
 
-        //then
+        Promo promo = Promo.builder()
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(category)
+                .build();
+
+        when(promoRepository.findAllByCategory_NameIgnoreCase(categoryName)).thenReturn(List.of(promo));
+
+        // When
+        List<PromoDto> listPromoDto = underTest.findByCategory(categoryName);
+
+        // Then
         assertAll(
-                () -> assertThat(categoryList.stream()).allMatch(category -> category.equalsIgnoreCase(categoryName)),
-                () -> assertThat(categoryList.stream()).hasSize(3)
+                () -> assertThat(listPromoDto).hasSize(1)
         );
     }
 
     @Test
-    void shouldFindByGivenNameAndCategory() {
-        //given
-        String categoryName = "Elektronika";
-        String name = "Mac";
+    void itShouldFindAllPromoByGivenNameAndCategory() {
+        // Given
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("john@rambo.com")
+                .password("rambo123")
+                .roles(Collections.emptySet())
+                .promo(Collections.emptyList())
+                .build();
 
-        //when
-        List<PromoDto> byNameAndCategory = promoService.findByNameAndCategory(name, categoryName);
-        List<String> categoryList = byNameAndCategory.stream().map(PromoDto::getCategory).toList();
-        List<String> nameList = byNameAndCategory.stream().map(PromoDto::getName).toList();
+        String categoryName = CategoryType.ELECTRONICS.getDescription();
+        System.out.println(categoryName);
 
-        //then
+        Category category = Category.builder()
+                .id(1L)
+                .name(categoryName)
+                .promoList(Collections.emptyList())
+                .build();
+
+        Promo promo = Promo.builder()
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(category)
+                .build();
+
+        String partOfTheName = promo.getName().substring(2, 6);
+
+        when(promoRepository.findAllByNameContainingIgnoreCaseAndCategory_NameIgnoreCase(partOfTheName, categoryName))
+                .thenReturn(List.of(promo));
+
+        // When
+        List<PromoDto> promoListByNameAndCategory = underTest.findByNameAndCategory(partOfTheName, categoryName);
+
+        // Then
         assertAll(
-                () -> categoryList.stream().allMatch(category -> category.equalsIgnoreCase(categoryName)),
-                () -> nameList.stream().allMatch(n -> n.equalsIgnoreCase(name))
+                () -> assertThat(promoListByNameAndCategory).isNotNull(),
+                () -> assertThat(promoListByNameAndCategory).isNotEmpty()
         );
     }
 
     @Test
-    @WithMockUser(username = "mateusz.kowalski@abc.pl", password = "simplePass")
-    void shouldFoundThreePromos() {
-        //given
-        String firstUserPromoName = "Apple MacBook Air M2";
-        String secondUserPromoName = "Czapka męska z daszkiem 4F Bejsbolówka 2023 L";
-        String thirdUserPromoName = "Tabliczka Tablica ADRESOWA ALUMINIOWA - Numer domu";
+    void itShouldFindAllPromoByGivenNameAndCategoryNameEqualsToAll() {
+        // Given
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email("john@rambo.com")
+                .password("rambo123")
+                .roles(Collections.emptySet())
+                .promo(Collections.emptyList())
+                .build();
 
-        //when
-        List<PromoDto> promosByUsername = promoService.findPromosByUsername();
+        String categoryName = CategoryType.All.getDescription();
 
-        //then
+        Category category = Category.builder()
+                .id(1L)
+                .name(categoryName)
+                .promoList(Collections.emptyList())
+                .build();
+
+        Promo promo = Promo.builder()
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(category)
+                .build();
+
+        String partOfTheName = promo.getName().substring(2, 6);
+
+        when(promoRepository.findAllByNameContainingIgnoreCase(partOfTheName))
+                .thenReturn(List.of(promo));
+
+        // When
+        List<PromoDto> promoListByNameAndCategory = underTest.findByNameAndCategory(partOfTheName, categoryName);
+
+        // Then
         assertAll(
-                () -> assertThat(promosByUsername.size()).isEqualTo(3),
-                () -> assertThat(promosByUsername.get(0).getName()).isEqualToIgnoringCase(firstUserPromoName),
-                () -> assertThat(promosByUsername.get(1).getName()).isEqualToIgnoringCase(secondUserPromoName),
-                () -> assertThat(promosByUsername.get(2).getName()).isEqualToIgnoringCase(thirdUserPromoName)
+                () -> assertThat(promoListByNameAndCategory).isNotNull(),
+                () -> assertThat(promoListByNameAndCategory).isNotEmpty()
         );
     }
 
     @Test
-    void shouldFindPromoById() {
-        //given
+    void itShouldFindCurrentUsernamePromos() {
+        // Given
+        String email = "john@rambo.com";
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .name("USER")
+                .description("Can log in service")
+                .build();
+
+        User user = User.builder()
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of(userRole))
+                .build();
+
+        Promo promo = Promo.builder()
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(new Category())
+                .build();
+
+        when(promoRepository.findPromosByUser_Email(email)).thenReturn(List.of(promo));
+
+        // When
+        List<PromoDto> promosByUsername = underTest.findPromosByUsername(email);
+
+        // Then
+        assertAll(
+                () -> assertThat(promosByUsername).hasSize(1)
+        );
+    }
+
+    @Test
+    void itShouldSavePromoToDb() {
+        // Given
+        String email = "john@rambo.com";
+
+        SavePromoDto savePromoDto = SavePromoDto.builder()
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .category(CategoryType.ELECTRONICS.getDescription())
+                .build();
+
+        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of("ADMIN"))
+                .build();
+
+        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+
+        // When
+        underTest.savePromo(savePromoDto, email);
+
+        // Then
+        assertAll(
+                () -> verify(promoRepository, times(1)).save(any())
+        );
+    }
+
+    @Test
+    void itShouldThrow403Exception() {
+        // Given
+        String email = "john@rambo.com";
+        SavePromoDto savePromoDto = SavePromoDto.builder()
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .category(CategoryType.ELECTRONICS.getDescription())
+                .build();
+
+        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of("NON_ADMIN_NON_USER"))
+                .build();
+        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+
+        // When
+        // Then
+        assertAll(
+                () -> assertThrows(ResponseStatusException.class, () -> underTest.savePromo(savePromoDto, email))
+        );
+    }
+
+    @Test
+    void itShouldUpdatePromoWhenUserIsAmin() {
+        // Given
+        String email = "john@rambo.com";
+
+        SavePromoDto savePromoDto = SavePromoDto.builder()
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .category(CategoryType.ELECTRONICS.getDescription())
+                .build();
+
+        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of("ADMIN"))
+                .build();
+
+        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+
+        // When
+        underTest.updatePromo(savePromoDto, email);
+
+        // Then
+        assertAll(
+                () -> verify(promoRepository, times(1)).save(any())
+        );
+    }
+
+    @Test
+    void itShouldUpdatePromo() {
+        // Given
+        String email = "john@rambo.com";
+
+        SavePromoDto savePromoDto = SavePromoDto.builder()
+                .id(1L)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .category(CategoryType.ELECTRONICS.getDescription())
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("currentPassword")
+                .roles(Collections.emptySet())
+                .build();
+
+        Promo promo = Promo.builder()
+                .id(1L)
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(new Category())
+                .build();
+
+        when(promoRepository.findPromosByUser_Email(email)).thenReturn(List.of(promo));
+        when(promoDtoMapper.map(savePromoDto)).thenReturn(promo);
+
+        // When
+        underTest.updatePromo(savePromoDto, email);
+
+        // Then
+        assertAll(
+                () -> verify(promoRepository, times(1)).save(any())
+        );
+    }
+
+    @Test
+    void itShouldThrow403ExceptionWhenUserTryToUpdatePromo() {
+        // Given
+        String email = "john@rambo.com";
+
+        SavePromoDto savePromoDto = SavePromoDto.builder()
+                .id(1L)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .category(CategoryType.ELECTRONICS.getDescription())
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("currentPassword")
+                .roles(Collections.emptySet())
+                .build();
+
+        Promo promo = Promo.builder()
+                .id(1L)
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(new Category())
+                .build();
+
+        when(promoRepository.findPromosByUser_Email(email)).thenReturn(Collections.emptyList());
+        when(promoDtoMapper.map(savePromoDto)).thenReturn(promo);
+
+        // When
+        // Then
+        assertAll(
+                () -> assertThrows(ResponseStatusException.class, () -> underTest.updatePromo(savePromoDto, email))
+        );
+    }
+
+    @Test
+    void itShouldDeletePromoWhenUserHasAdminRole() {
+        // Given
+        String email = "john@rambo.com";
+
+        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of("ADMIN"))
+                .build();
+
+        Long promoId = 1L;
+        Promo promo = Promo.builder()
+                .id(promoId)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(new Category())
+                .build();
+
+        when(promoRepository.findById(promoId)).thenReturn(Optional.of(promo));
+        when(promoRepository.findPromosByUser_Email(email)).thenReturn(List.of(promo));
+        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+
+        // When
+        underTest.deletePromo(promoId, email);
+
+        // Then
+        assertAll(
+                () -> verify(promoRepository, times(1)).deleteById(promoId)
+        );
+    }
+
+    @Test
+    void itShouldDeletePromoWhenUserHasUserRoleAndPromoBelongsToThatUser() {
+        // Given
+        String email = "john@rambo.com";
+
+        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of("USER"))
+                .build();
+
+        Long promoId = 1L;
+        Promo promo = Promo.builder()
+                .id(promoId)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(new Category())
+                .build();
+
+        when(promoRepository.findById(promoId)).thenReturn(Optional.of(promo));
+        when(promoRepository.findPromosByUser_Email(email)).thenReturn(List.of(promo));
+        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+
+        // When
+        underTest.deletePromo(promoId, email);
+
+        // Then
+        assertAll(
+                () -> verify(promoRepository, times(1)).deleteById(promoId)
+        );
+    }
+
+    @Test
+    void itShouldThrow404NotFoundException() {
+        // Given
+        String email = "john@rambo.com";
+        UserRole adminRole = UserRole.builder()
+                .id(1L)
+                .name("ADMIN")
+                .description("Can log in service")
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("password")
+                .roles(Set.of(adminRole))
+                .build();
+
+        Long promoId = 1L;
+
+        Promo promo = Promo.builder()
+                .id(promoId)
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(new Category())
+                .user(user)
+                .build();
+
+        when(promoRepository.findPromosByUser_Email(email)).thenReturn(List.of(promo));
+        when(promoRepository.findById(promoId)).thenReturn(Optional.empty());
+
+        // When
+        // Then
+        assertAll(
+                () -> assertThrows(ResponseStatusException.class, () -> underTest.deletePromo(promoId, email))
+        );
+    }
+
+    @Test
+    void itShouldThrow403StatusExceptionWhenUserHasNoRole() {
+        // Given
+        String email = "john@rambo.com";
+        UserRole noRole = UserRole.builder()
+                .id(1L)
+                .name("EMPTY_ROLE")
+                .description("Can log in service")
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Rambo")
+                .email(email)
+                .password("password")
+                .roles(Set.of(noRole))
+                .build();
+
+        Long promoId = 1L;
+
+        Promo promo = Promo.builder()
+                .id(promoId)
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .added(LocalDateTime.now().minusDays(1L))
+                .category(new Category())
+                .user(user)
+                .build();
+
+        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
+                .email(email)
+                .password("currentPassword")
+                .roles(Set.of("NO_ROLE"))
+                .build();
+
+        when(promoRepository.findPromosByUser_Email(email)).thenReturn(List.of(promo));
+        when(promoRepository.findById(promoId)).thenReturn(Optional.of(promo));
+        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+
+        // When
+        // Then
+        assertAll(
+                () -> assertThrows(ResponseStatusException.class, () -> underTest.deletePromo(promoId, email))
+        );
+    }
+
+    @Test
+    void itShouldFindUserByGivenId() {
+        // Given
         Long id = 1L;
-
-        //when
-        Optional<PromoDto> promoById = promoService.getPromoById(id);
-
-        //then
-        assertAll(
-                () -> assertThat(promoById).isPresent(),
-                () -> assertThat(promoById).isNotEmpty()
-        );
-    }
-
-    @Test
-    @WithMockUser(username = "mateusz.kowalski@abc.pl", password = "simplePass")
-    void shouldSavePromoWithId7() {
-        //given
-        SavePromoDto promoToSave = SavePromoDto.builder()
-                .name("Promocja 1")
-                .description("Najlepsza promocja wszechczasów. Unikatowy, niezawodny rolex")
-                .price(new BigDecimal("200"))
-                .urlAddress("https://www.najlepszapromocja.pl")
-                .category("Elektronika")
-                .imageFilename("imageFilename")
+        User user = User.builder()
+                .id(id)
+                .firstName("John")
+                .lastName("Rambo")
+                .email("john@rambo.com")
+                .password("password")
+                .roles(Collections.emptySet())
                 .build();
 
-        //when
-        promoService.savePromo(promoToSave);
-        Optional<PromoDto> promoById = promoService.getPromoById(7L);
-
-        //then
-        assertAll(
-                () -> assertThat(promoById).isNotEmpty(),
-                () -> assertThat(promoById).isPresent(),
-                () -> assertThat(promoById.orElseThrow().getId()).isEqualTo(7),
-                () -> assertThat(promoById.orElseThrow().getName()).isEqualToIgnoringCase(promoToSave.getName()),
-                () -> assertThat(promoById.orElseThrow().getDescription()).isEqualToIgnoringCase(promoToSave.getDescription()),
-                () -> assertThat(promoById.orElseThrow().getPrice()).isEqualByComparingTo(promoToSave.getPrice()),
-                () -> assertThat(promoById.orElseThrow().getUrlAddress()).isEqualTo(promoToSave.getUrlAddress()),
-                () -> assertThat(promoById.orElseThrow().getImageFilename()).isEqualToIgnoringCase(promoToSave.getImageFilename())
-        );
-    }
-
-    @Test
-    @WithMockUser(username = "mateusz.kowalski@abc.pl", password = "simplePass")
-    void shouldUpdatePromo() {
-        //given
-        PromoDto promoDto = promoService.getPromoById(2L).orElseThrow();
-        String newPromoName = "Najlepszy MacBook na świecie";
-        promoDto.setName(newPromoName);
-        SavePromoDto promoToUpdate = SavePromoDto.builder()
-                .id(promoDto.getId())
-                .name(promoDto.getName())
-                .description(promoDto.getDescription())
-                .price(promoDto.getPrice())
-                .urlAddress(promoDto.getUrlAddress())
-                .category(promoDto.getCategory())
-                .imageFilename("empty-image.png")
+        Promo promo = Promo.builder()
+                .id(id)
+                .user(user)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
                 .build();
 
-        log.info(promoDto.getImageFilename());
+        PromoDto promoDto = PromoDto.builder()
+                .id(id)
+                .name("testPromo1")
+                .description("best promo you ever saw 1")
+                .price(new BigDecimal("99.99"))
+                .build();
 
-        //when
-        promoService.updatePromo(promoToUpdate);
-        PromoDto updatedPromo = promoService.getPromoById(2L).orElseThrow();
+        when(promoRepository.findById(id)).thenReturn(Optional.of(promo));
+        when(promoDtoMapper.map(promo)).thenReturn(promoDto);
 
-        //then
+        // When
+        Optional<PromoDto> optionalPromoDto = underTest.findById(id);
+
+        // Then
         assertAll(
-                () -> assertTrue(updatedPromo.getName().equalsIgnoreCase(newPromoName))
+                () -> assertThat(optionalPromoDto.isPresent()).isTrue()
         );
     }
 }

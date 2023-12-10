@@ -6,8 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.PromoService;
+import pl.dk.dealspotter.promo.dto.PromoDto;
 
 import java.util.List;
 
@@ -21,11 +21,17 @@ class CategoryController {
         this.promoService = promoService;
     }
 
-    @GetMapping("/{selectCategory}")
-    String categoryPromo(@PathVariable String selectCategory, Model model) {
-        List<PromoDto> promoList = promoService.findByCategory(selectCategory);
-        model.addAttribute("list", promoList);
-        model.addAttribute("category", selectCategory);
+    @GetMapping("/{categoryName}")
+    String categoryPromo(@PathVariable String categoryName, Model model) {
+        String allCategory = CategoryType.All.getDescription();
+        if (categoryName.equalsIgnoreCase(allCategory)) {
+            List<PromoDto> allPromo = promoService.findAllPromo();
+            model.addAttribute("list", allPromo);
+        } else  {
+            List<PromoDto> promosByCategory = promoService.findByCategory(categoryName);
+            model.addAttribute("list", promosByCategory);
+        }
+        model.addAttribute("category", categoryName);
         return "index";
     }
 }

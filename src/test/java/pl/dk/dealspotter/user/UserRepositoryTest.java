@@ -16,6 +16,7 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository underTest;
+
     @Test
     void itShouldFindUserByGivenEmail() {
         // Given

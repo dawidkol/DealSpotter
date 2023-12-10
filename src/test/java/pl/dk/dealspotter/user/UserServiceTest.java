@@ -69,18 +69,16 @@ class UserServiceTest {
                 .roles(Set.of(userRole))
                 .build();
 
-
-        // When
         when(userRoleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
         when(passwordEncoder.encode(userRegistrationDto.getPassword())).thenReturn("rambo123");
 
+        // When
         underTest.register(userRegistrationDto);
-
-        Mockito.verify(userRepository).save(userCaptor.capture());
-        Mockito.verify(userRoleRepository).findByName("USER");
 
         // Then
         assertAll(
+                () -> Mockito.verify(userRepository).save(userCaptor.capture()),
+                () -> Mockito.verify(userRoleRepository).findByName("USER"),
                 () -> assertThat(user).isEqualTo(userCaptor.getValue())
         );
     }
@@ -138,7 +136,6 @@ class UserServiceTest {
         UserCredentialsDto userCredentialsDto = userCredentialsDtoMapper.userCredentialsDto(user);
         Optional<UserCredentialsDto> optionalUserCredentialsDto = underTest.findCredentialsByEmail(email);
 
-
         // Then
         assertAll(
                 () -> Mockito.verify(userRepository).findByEmail(email),
@@ -174,7 +171,6 @@ class UserServiceTest {
                 .password(user.getPassword())
                 .roles(String.valueOf(user.getRoles()))
                 .build();
-
 
         // set security context holder
         SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
@@ -291,7 +287,6 @@ class UserServiceTest {
                 .password(user.getPassword())
                 .roles(String.valueOf(user.getRoles()))
                 .build();
-
 
         // set security context holder
         SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();

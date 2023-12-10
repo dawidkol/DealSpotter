@@ -1,12 +1,12 @@
 package pl.dk.dealspotter.promo;
 
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.dk.dealspotter.category.Category;
 import pl.dk.dealspotter.category.CategoryRepository;
 import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.dto.SavePromoDto;
+import pl.dk.dealspotter.security.SecurityService;
 import pl.dk.dealspotter.user.User;
 import pl.dk.dealspotter.user.UserDtoMapper;
 import pl.dk.dealspotter.user.UserRepository;
@@ -38,12 +38,14 @@ class PromoDtoMapper {
                 .category(promo.getCategory().getName())
                 .imageFilename(promo.getImageFilename())
                 .userDto(getUserDto(promo))
-                .localDateTime(promo.getLocalDateTime())
+                .localDateTime(promo.getAdded())
                 .build();
     }
 
     private UserDto getUserDto(Promo promo) {
-        return userRepository.findById(promo.getUser().getId()).map(userDtoMapper::map).orElseThrow(NoSuchElementException::new);
+        return userRepository.findById(promo.getUser().getId())
+                .map(userDtoMapper::map)
+                .orElseThrow(NoSuchElementException::new);
     }
 
     Promo map(SavePromoDto savePromoDto) {
@@ -55,17 +57,19 @@ class PromoDtoMapper {
                 .urlAddress(savePromoDto.getUrlAddress())
                 .category(getCategory(savePromoDto))
                 .imageFilename(setImage(savePromoDto))
-                .user(getCurrentUser())
-                .localDateTime(LocalDateTime.now())
+                .user(findCurrentUsername())
+                .added(LocalDateTime.now())
                 .build();
     }
 
     private Category getCategory(SavePromoDto savePromoDto) {
-        return categoryRepository.findByName(savePromoDto.getCategory()).orElseThrow(NoSuchElementException::new);
+        return categoryRepository.findByName(savePromoDto.getCategory())
+                .orElseThrow(NoSuchElementException::new);
     }
 
-    private User getCurrentUser() {
-        return userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(NoSuchElementException::new);
+    private User findCurrentUsername() {
+        return userRepository.findByEmail(SecurityService.findCurrentUsername())
+                .orElseThrow(NoSuchElementException::new);
     }
 
     private String setImage(SavePromoDto savePromoDto) {

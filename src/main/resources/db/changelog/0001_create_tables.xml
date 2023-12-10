@@ -26,7 +26,7 @@
             </column>
             <column name="image_filename" type="VARCHAR(300)"/>
             <column name="user_id" type="BIGINT"/>
-            <column name="local_date_time" type="DATETIME"/>
+            <column name="added" type="DATETIME"/>
         </createTable>
 
         <addForeignKeyConstraint baseTableName="promo"
@@ -37,8 +37,6 @@
 
     </changeSet>
     <changeSet id="0003" author="dk">
-
-
         <createTable tableName="application_user">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
@@ -81,7 +79,5 @@
                 />
             </column>
         </createTable>
-
-
     </changeSet>
 </databaseChangeLog>

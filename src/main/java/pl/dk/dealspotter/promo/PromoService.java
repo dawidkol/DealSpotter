@@ -1,19 +1,17 @@
 package pl.dk.dealspotter.promo;
 
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import pl.dk.dealspotter.category.CategoryType;
 import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.dto.SavePromoDto;
 import pl.dk.dealspotter.user.UserService;
 import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,57 +25,49 @@ public class PromoService {
     private final UserService userService;
 
     public List<PromoDto> findAllPromo() {
-        List<Promo> list = (List<Promo>) promoRepository.findAll();
-        Collections.reverse(list);
-        return list.stream().map(promoDtoMapper::map).toList();
-    }
-
-    public List<PromoDto> findByCategory(String category) {
-        if (category.equalsIgnoreCase("Wszystkie kategorie")) {
-            List<Promo> allPromoList = (List<Promo>) promoRepository.findAll();
-            return allPromoList.stream().map(promoDtoMapper::map).toList();
-        } else {
-            List<Promo> promosByCategory = (List<Promo>) promoRepository.findAll();
-            return promosByCategory.stream().filter(a ->
-                            a.getCategory().getName().equalsIgnoreCase(category))
-                    .map(promoDtoMapper::map)
-                    .toList();
-        }
-    }
-
-    public List<PromoDto> findByNameAndCategory(String name, String category) {
-        List<Promo> list = (List<Promo>) promoRepository.findAll();
-        if (category.equals("Wszystkie kategorie")) {
-            return list.stream()
-                    .filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
-                    .map(promoDtoMapper::map)
-                    .toList();
-        }
-        return list.stream()
-                .filter(a -> a.getName().toLowerCase().contains(name.toLowerCase()))
-                .filter(a -> a.getCategory().getName().equalsIgnoreCase(category))
-                .map(promoDtoMapper::map)
-                .toList();
-    }
-
-    public List<PromoDto> findPromosByUsername() {
-        String name = findCurrentUsername();
-        return promoRepository
-                .findPromosByUser_Email(name)
+        return promoRepository.findAllPromosOrderByDateDescending()
                 .stream()
                 .map(promoDtoMapper::map)
                 .toList();
     }
 
-    public Optional<PromoDto> getPromoById(Long id) {
+    public List<PromoDto> findByCategory(String categoryName) {
+        return promoRepository.findAllByCategory_NameIgnoreCase(categoryName)
+                .stream()
+                .map(promoDtoMapper::map)
+                .toList();
+    }
+
+    public List<PromoDto> findByNameAndCategory(String name, String categoryName) {
+        if (categoryName.equalsIgnoreCase(CategoryType.All.getDescription())) {
+            return promoRepository.findAllByNameContainingIgnoreCase(name)
+                    .stream()
+                    .map(promoDtoMapper::map)
+                    .toList();
+        } else {
+            return promoRepository.findAllByNameContainingIgnoreCaseAndCategory_NameIgnoreCase(name, categoryName)
+                    .stream()
+                    .map(promoDtoMapper::map)
+                    .toList();
+        }
+    }
+
+    public List<PromoDto> findPromosByUsername(String email) {
+        return promoRepository
+                .findPromosByUser_Email(email)
+                .stream()
+                .map(promoDtoMapper::map)
+                .toList();
+    }
+
+    public Optional<PromoDto> findById(Long id) {
         return promoRepository
                 .findById(id)
                 .map(promoDtoMapper::map);
     }
 
     @Transactional
-    public void savePromo(SavePromoDto savePromoDto) {
-        String email = findCurrentUsername();
+    public void savePromo(SavePromoDto savePromoDto, String email) {
         if (isAdmin(email) || isUser(email)) {
             Promo promo = promoDtoMapper.map(savePromoDto);
             promoRepository.save(promo);
@@ -87,25 +77,25 @@ public class PromoService {
     }
 
     @Transactional
-    public void updatePromo(SavePromoDto savePromoDto) {
-        String email = findCurrentUsername();
+    public void updatePromo(SavePromoDto savePromoDto, String email) {
         Promo promo = promoDtoMapper.map(savePromoDto);
         if (isAdmin(email)) {
             promoRepository.save(promo);
-        } else if (checkIfUserPromo(promo, email)) {
+        } else if (checkIfUserPromo(promo.getId(), email)) {
             promoRepository.save(promo);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }
 
+
     @Transactional
-    public void deletePromo(Long id) {
-        String email = findCurrentUsername();
-        Promo save = promoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public void deletePromo(Long id, String email) {
+        Promo promo = promoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (isAdmin(email)) {
             promoRepository.deleteById(id);
-        } else if (checkIfUserPromo(save, email)) {
+        } else if (checkIfUserPromo(promo.getId(), email) && isUser(email)) {
             promoRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -126,16 +116,13 @@ public class PromoService {
                 .anyMatch(credential -> credential.stream().anyMatch(c -> c.equalsIgnoreCase("USER")));
     }
 
-    public boolean checkIfUserPromo(Promo promo, String email) {
+    private boolean checkIfUserPromo(Long id, String email) {
         return promoRepository.findPromosByUser_Email(email)
                 .stream()
                 .map(Promo::getId)
-                .anyMatch(id -> Objects.equals(id, promo.getId()));
+                .anyMatch(promoId -> Objects.equals(promoId, id));
     }
 
-    private static String findCurrentUsername() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
-    }
 }
 
 

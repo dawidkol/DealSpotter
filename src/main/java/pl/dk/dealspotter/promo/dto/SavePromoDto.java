@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 public class SavePromoDto {
     private Long id;
     @NotNull

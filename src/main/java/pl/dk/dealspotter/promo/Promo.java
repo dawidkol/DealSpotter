@@ -5,10 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.validator.constraints.URL;
 import pl.dk.dealspotter.category.Category;
 import pl.dk.dealspotter.user.User;
@@ -21,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class Promo {
 
     @Id
@@ -38,7 +36,7 @@ public class Promo {
     @URL
     private String urlAddress;
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "category_id")
     private Category category;
     private String imageFilename;
@@ -48,7 +46,5 @@ public class Promo {
     private User user;
     @NotNull
     @PastOrPresent
-    private LocalDateTime localDateTime;
-
-
+    private LocalDateTime added;
 }

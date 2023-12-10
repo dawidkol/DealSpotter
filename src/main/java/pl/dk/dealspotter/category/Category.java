@@ -4,9 +4,7 @@ package pl.dk.dealspotter.category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pl.dk.dealspotter.promo.Promo;
 
 import java.util.ArrayList;
@@ -16,6 +14,10 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
+@Builder
+@AllArgsConstructor
 public class Category {
 
     @NotNull

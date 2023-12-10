@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import pl.dk.dealspotter.promo.PromoService;
 import pl.dk.dealspotter.promo.dto.PromoDto;
+import pl.dk.dealspotter.security.SecurityService;
 import pl.dk.dealspotter.user.dto.UserDto;
 
 import java.util.List;
@@ -31,7 +32,8 @@ class UserController {
 
     @GetMapping("/promo/all")
     String userPromos(Model model) {
-        List<PromoDto> promos = promoService.findPromosByUsername();
+        String email = SecurityService.findCurrentUsername();
+        List<PromoDto> promos = promoService.findPromosByUsername(email);
         model.addAttribute("promoList", promos);
         return "promo-list";
     }

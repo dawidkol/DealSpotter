@@ -1,4 +1,4 @@
-package pl.dk.dealspotter.config;
+package pl.dk.dealspotter.security;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;

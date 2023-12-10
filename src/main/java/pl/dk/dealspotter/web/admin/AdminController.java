@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import pl.dk.dealspotter.promo.PromoService;
 import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.dto.SavePromoDto;
+import pl.dk.dealspotter.security.SecurityService;
 import pl.dk.dealspotter.user.UserNotFoundException;
 import pl.dk.dealspotter.user.UserService;
 import pl.dk.dealspotter.user.dto.UserCredentialsDto;
@@ -20,7 +21,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 class AdminController {
-    private static final String ADMIN_AUTHORITY = "ADMIN";
+
+    public static final String ADMIN_AUTHORITY = "ADMIN";
     private final PromoService promoService;
     private final UserService userService;
 
@@ -46,15 +48,19 @@ class AdminController {
     }
 
     @GetMapping("/promo/delete/{id}")
-    String deletePromo(@PathVariable Long id) {
-        promoService.deletePromo(id);
-        return "redirect:/admin/promo/all";
+    String deleteUserPromo(@PathVariable Long id) {
+        String email = SecurityService.findCurrentUsername();
+        promoService.deletePromo(id, email);
+        if (isAdmin()) {
+            return "redirect:/admin/promo/all";
+        } else {
+            return "redirect:/user/promo/all";
+        }
     }
 
     @GetMapping("/users/all")
     String allUsers(Model model) {
         if (isAdmin()) {
-
             List<UserDto> allUsers = userService.findAllUsers();
             model.addAttribute("allUsers", allUsers);
             return "all-users";
@@ -64,10 +70,9 @@ class AdminController {
     @GetMapping("/user/delete/{username}")
     String deleteUser(@PathVariable String username) {
         if (isAdmin()) {
-
             userService.deleteUser(username);
             return "redirect:/admin/users/all";
-        }  else throw new SecurityException("Brak uprawnień do strony");
+        } else throw new SecurityException("Brak uprawnień do strony");
     }
 
     private boolean isAdmin() {
