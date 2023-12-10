@@ -1,7 +1,9 @@
 spring:
+  datasource:
+    url: jdbc:h2:mem:test
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     properties:
       jakarta:
         persistence:
@@ -11,8 +13,9 @@ spring:
         show_sql: true
         format_sql: true
   liquibase:
-    enabled: false
+    enabled: true
     change-log: classpath:/db/changelog/master-test.xml
+    contexts: test
 logging:
   level:
     org:
@@ -20,6 +23,6 @@ logging:
         orm:
           jdbc:
             bind: TRACE
-
-
-
+app:
+  storage:
+    location: ./uploads/

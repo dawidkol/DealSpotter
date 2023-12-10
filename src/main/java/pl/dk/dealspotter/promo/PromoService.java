@@ -88,7 +88,6 @@ public class PromoService {
         }
     }
 
-
     @Transactional
     public void deletePromo(Long id, String email) {
         Promo promo = promoRepository.findById(id)
