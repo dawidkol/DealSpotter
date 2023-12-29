@@ -26,6 +26,12 @@ A web application that enables users to track various offers and promotions in o
     <ul>
         <li>The application also includes a simple user registration function</li>
     </ul>    
+    </li><br>
+    <li> Search option
+    <ul>
+        <li>The application features a search option</li>
+    </ul> 
+    </li>
 </ol>
 
 <h2>Technologies</h1>
