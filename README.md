@@ -2,9 +2,9 @@
 <p>
 A web application that enables users to track various offers and promotions in online stores. The application offers a convenient registration and login process. Once logged in, users have the ability to add, delete, and update the offers and promotions they have added.
 </p>
-<h2>Key Fetures</h2>
+<h2><strong>Key Fetures</strong></h2>
 <ol>
-    <li>Admin Panel:
+    <li><strong>Admin Panel:</strong>
     <ul>
         <li>Deleting all users</li>
         <li>Deleting and editing all added announcements</li>
@@ -16,18 +16,18 @@ A web application that enables users to track various offers and promotions in o
         <li><strong>Password:</strong> admin</li>
     </ul>
     </li> <br>
-    <li>User Panel:
+    <li><strong>User Panel:</strong>
     <ul>
         <li>Deleting and editing added announcements</li>
         <li>Changing the account password</li>
     </ul>
     </li> <br>
-    <li>User Registration Functionality:
+    <li><strong>User Registration Functionality:</strong>
     <ul>
         <li>The application also includes a simple user registration function</li>
     </ul>    
     </li><br>
-    <li> Search option
+    <li> <strong>Search option</strong>
     <ul>
         <li>The application features a search option</li>
     </ul> 
