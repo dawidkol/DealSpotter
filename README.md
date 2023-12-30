@@ -2,7 +2,7 @@
 <p>
 A web application that enables users to track various offers and promotions in online stores. The application offers a convenient registration and login process. Once logged in, users have the ability to add, delete, and update the offers and promotions they have added.
 </p>
-<h2><strong>Key Fetures</strong></h2>
+<h2><strong>Key Features</strong></h2>
 <ol>
     <li><strong>Admin Panel:</strong>
     <ul>
