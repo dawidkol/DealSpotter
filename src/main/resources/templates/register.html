@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="pl" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments::head(title = 'Zarejestruj')}">
-
+<head th:replace="~{fragments::head(title = 'Rejestracja')}">
+    <title>Rejestracja</title>
 </head>
 <body>
 <main>
     <div class="form container">
         <nav th:replace="~{fragments::login-navbar}"></nav>
-
         <form method="post" th:action="@{/register}" action="#" th:object="${user}">
             <h3>Panel rejestracji</h3>
             <label>
@@ -31,15 +30,9 @@
                 <p class="error" th:errors="*{password}"></p>
             </label>
             <button type="submit">Rejestruj</button>
-
         </form>
     </div>
 </main>
-
-
 <footer th:replace="~{fragments::footer}"></footer>
-</footer>
-
-
 </body>
 </html>

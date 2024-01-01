@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="head">
     <meta charset="UTF-8">
-    <title th:text="${title}">DealSpotter - promocje</title>
+    <title th:text="${title}">DealSpotter</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
           integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
           crossorigin="anonymous"
@@ -13,9 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Raleway:ital@1&display=swap"
           rel="stylesheet">
     <link rel="stylesheet" href="../static/styles/main.css" th:href="@{/styles/main.css}">
-
 </head>
-
 <nav th:fragment="navbar" class="navbar">
     <a href="/" class="logo">
         <i class="fa-brands fa-shopify"></i>
@@ -35,15 +33,12 @@
         </label>
         <button type="submit" class="search-button">Szukaj</button>
     </form>
-    <a class="user-option" href="/promo/save">Dodaj promocję</a>
-
-
+    <a class="user-option" href="/promo/save">Dodaj ofertę</a>
     <a sec:authorize="isAuthenticated() and hasRole('USER')" href="/user" class="user-option">Twoje konto</a>
     <a sec:authorize="isAuthenticated() and hasRole('ADMIN')" href="/admin" class="user-option">Administracja</a>
     <a class="user-option" sec:authorize="isAuthenticated()" href="/logout">Wyloguj się</a>
     <a class="user-option" sec:authorize="!isAuthenticated()" href="/login">Zaloguj się</a>
 </nav>
-
 <nav th:fragment="login-navbar" class="navbar">
     <a href="/" class="logo">
         <i class="fa-brands fa-shopify"></i>
@@ -51,7 +46,6 @@
     </a>
     <a class="user-option" sec:authorize="isAuthenticated()" href="/logout">Wyloguj się</a>
 </nav>
-
 <footer th:fragment="footer" class="footer">
     <p><i class="fa-brands fa-shopify"></i> DealSpotter 2023 <i class="fa-solid fa-copyright"></i>
         <a href="mailto:dawid.kolono@icloud.com"> DK </a></p>

@@ -2,12 +2,11 @@
 <html lang="pl" xmlns:th="http://www.thymeleaf.org"
 >
 <head th:replace="~{fragments::head(title='Edycja')}">
+    <title>Edycja</title>
 <body>
 <nav th:replace="~{fragments::login-navbar}">
 </nav>
 <main>
-
-
     <div class="form container">
         <form th:fragment="save-promo-form" method="post" th:action="@{/promo/update}" th:object="${promo}"
               enctype="multipart/form-data">
@@ -44,7 +43,6 @@
             <button type="submit">Zapisz</button>
         </form>
     </div>
-
 </main>
 
 <footer th:replace="~{fragments::footer}">

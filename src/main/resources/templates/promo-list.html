@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="pl" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments::head(title ='Admin - lista promocji')}">
+<head th:replace="~{fragments::head(title ='Oferty')}">
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
 <nav th:replace="~{fragments::login-navbar}">
 </nav>
-
 <main>
-
     <div class="container styled-table">
-        <h2 class="list-heading">Lista promocji</h2>
+        <h2 class="list-heading">Lista ofert</h2>
         <table class="styled-table">
             <thead>
             <tr>
@@ -32,11 +30,8 @@
             </tr>
             </tbody>
         </table>
-        </form>
     </div>
     <footer th:replace="~{fragments::footer}"></footer>
 </main>
-
-
 </body>
 </html>
