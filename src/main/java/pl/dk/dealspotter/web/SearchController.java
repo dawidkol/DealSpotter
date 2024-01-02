@@ -21,7 +21,6 @@ class SearchController {
     String searchPromo(@RequestParam String string, @RequestParam String category, Model model) {
         List<PromoDto> promoList = promoService.findByNameAndCategory(string, category);
         model.addAttribute("list", promoList);
-        model.addAttribute("searchString", string);
         return "index";
     }
 }

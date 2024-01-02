@@ -21,12 +21,13 @@ class SecurityConfig {
                 .permitAll()
                 .requestMatchers("/")
                 .permitAll()
-                .requestMatchers("/admin/promo/delete/{id}")
-                .hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/user/**", "/promo/save/**", "/promo/edit/**", "/promo/update/**")
-                .hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/admin/**")
+
+                .requestMatchers("/user/delete/*{username}", "user/all-users")
                 .hasRole("ADMIN")
+
+                .requestMatchers("/user/promo/all","/user/promo/delete/{id}",  "/promo/save/**", "/promo/edit/**", "/promo/update/**")
+                .hasAnyRole("USER", "ADMIN")
+
                 .anyRequest()
                 .permitAll());
 

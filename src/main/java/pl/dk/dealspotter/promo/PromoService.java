@@ -10,11 +10,13 @@ import pl.dk.dealspotter.category.CategoryType;
 import pl.dk.dealspotter.promo.dto.PromoDto;
 import pl.dk.dealspotter.promo.dto.SavePromoDto;
 import pl.dk.dealspotter.user.UserService;
-import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static pl.dk.dealspotter.user.UserService.ADMIN_ROLE;
+import static pl.dk.dealspotter.user.UserService.USER_ROLE;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class PromoService {
     }
 
     public List<PromoDto> findByCategory(String categoryName) {
-        return promoRepository.findAllByCategory_NameIgnoreCase(categoryName)
+        return promoRepository.findAllByCategory(categoryName)
                 .stream()
                 .map(promoDtoMapper::map)
                 .toList();
@@ -68,7 +70,7 @@ public class PromoService {
 
     @Transactional
     public void savePromo(SavePromoDto savePromoDto, String email) {
-        if (isAdmin(email) || isUser(email)) {
+        if (userService.checkCredentials(email, ADMIN_ROLE) || userService.checkCredentials(email, USER_ROLE)) {
             Promo promo = promoDtoMapper.map(savePromoDto);
             promoRepository.save(promo);
         } else {
@@ -79,9 +81,7 @@ public class PromoService {
     @Transactional
     public void updatePromo(SavePromoDto savePromoDto, String email) {
         Promo promo = promoDtoMapper.map(savePromoDto);
-        if (isAdmin(email)) {
-            promoRepository.save(promo);
-        } else if (checkIfUserPromo(promo.getId(), email)) {
+        if (userService.checkCredentials(email, ADMIN_ROLE) || checkIfUserPromo(promo.getId(), email)) {
             promoRepository.save(promo);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -92,34 +92,18 @@ public class PromoService {
     public void deletePromo(Long id, String email) {
         Promo promo = promoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (isAdmin(email)) {
-            promoRepository.deleteById(id);
-        } else if (checkIfUserPromo(promo.getId(), email) && isUser(email)) {
+        if (userService.checkCredentials(email, ADMIN_ROLE) || checkIfUserPromo(promo.getId(), email)) {
             promoRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }
 
-    private boolean isAdmin(String email) {
-        return userService.findCredentialsByEmail(email)
-                .stream()
-                .map(UserCredentialsDto::getRoles)
-                .anyMatch(credential -> credential.stream().anyMatch(c -> c.equalsIgnoreCase("ADMIN")));
-    }
-
-    private boolean isUser(String email) {
-        return userService.findCredentialsByEmail(email)
-                .stream()
-                .map(UserCredentialsDto::getRoles)
-                .anyMatch(credential -> credential.stream().anyMatch(c -> c.equalsIgnoreCase("USER")));
-    }
-
-    private boolean checkIfUserPromo(Long id, String email) {
+    private boolean checkIfUserPromo(Long promoId, String email) {
         return promoRepository.findPromosByUser_Email(email)
                 .stream()
                 .map(Promo::getId)
-                .anyMatch(promoId -> Objects.equals(promoId, id));
+                .anyMatch(id -> Objects.equals(id, promoId));
     }
 
 }

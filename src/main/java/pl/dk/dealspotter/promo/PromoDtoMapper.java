@@ -63,7 +63,7 @@ class PromoDtoMapper {
     }
 
     private Category getCategory(SavePromoDto savePromoDto) {
-        return categoryRepository.findByName(savePromoDto.getCategory())
+        return categoryRepository.findByNameIgnoreCase(savePromoDto.getCategory())
                 .orElseThrow(NoSuchElementException::new);
     }
 

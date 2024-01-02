@@ -1,9 +1,9 @@
 package pl.dk.dealspotter.user;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import pl.dk.dealspotter.promo.PromoService;
 import pl.dk.dealspotter.promo.dto.PromoDto;
@@ -24,8 +24,9 @@ class UserController {
     }
 
     @GetMapping("")
-    String username(Authentication authentication, Model model) {
-        UserDto user = userService.findUser(authentication.getName()).orElseThrow(SecurityException::new);
+    String username(Model model) {
+        String currentUsername = SecurityService.findCurrentUsername();
+        UserDto user = userService.findByEmail(currentUsername).orElseThrow(SecurityException::new);
         model.addAttribute("user", user);
         return "user";
     }
@@ -33,8 +34,34 @@ class UserController {
     @GetMapping("/promo/all")
     String userPromos(Model model) {
         String email = SecurityService.findCurrentUsername();
-        List<PromoDto> promos = promoService.findPromosByUsername(email);
-        model.addAttribute("promoList", promos);
+        if (userService.checkCredentials(email, UserService.ADMIN_ROLE)) {
+            List<PromoDto> promos = promoService.findAllPromo();
+            model.addAttribute("promoList", promos);
+        } else {
+            List<PromoDto> promos = promoService.findPromosByUsername(email);
+            model.addAttribute("promoList", promos);
+        }
         return "promo-list";
     }
+
+    @GetMapping("/promo/delete/{id}")
+    String deleteUserPromo(@PathVariable Long id) {
+        String email = SecurityService.findCurrentUsername();
+        promoService.deletePromo(id, email);
+        return "redirect:/user/promo/all";
+    }
+
+    @GetMapping("/all-users")
+    String allUsers(Model model) {
+        List<UserDto> allUsers = userService.findAllUsers();
+        model.addAttribute("allUsers", allUsers);
+        return "all-users";
+    }
+
+    @GetMapping("/delete/{username}")
+    String deleteUser(@PathVariable String username) {
+        userService.deleteUser(username);
+        return "redirect:/user/all-users";
+    }
+
 }

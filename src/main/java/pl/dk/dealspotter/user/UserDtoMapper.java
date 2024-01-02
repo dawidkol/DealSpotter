@@ -11,7 +11,6 @@ public class UserDtoMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .promo(user.getPromo())
                 .build();
     }
 }

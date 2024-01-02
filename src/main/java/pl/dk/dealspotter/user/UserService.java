@@ -11,11 +11,13 @@ import pl.dk.dealspotter.user.dto.UserRegistrationDto;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private static final String USER_ROLE = "USER";
+    public static final String USER_ROLE = "USER";
+    public static final String ADMIN_ROLE = "ADMIN";
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
@@ -53,14 +55,13 @@ public class UserService {
         currentUser.setPassword(newPasswordHash);
     }
 
-    public Optional<UserDto> findUser(String email) {
+    public Optional<UserDto> findByEmail(String email) {
         return userRepository.findByEmail(email).map(userDtoMapper::map);
     }
 
     public List<UserDto> findAllUsers() {
-        return ((List<User>) (userRepository.findAll()))
+        return userRepository.findAllByRolesNameIgnoreCase(USER_ROLE)
                 .stream()
-                .filter(user -> user.getRoles().stream().allMatch(x -> x.getName().equalsIgnoreCase(USER_ROLE)))
                 .map(userDtoMapper::map)
                 .toList();
     }
@@ -73,4 +74,11 @@ public class UserService {
 
     }
 
+    public boolean checkCredentials(String email, String role) {
+        return this.findCredentialsByEmail(email)
+                .stream()
+                .map(UserCredentialsDto::getRoles)
+                .flatMap(Set::stream)
+                .anyMatch(c -> c.equalsIgnoreCase(role));
+    }
 }

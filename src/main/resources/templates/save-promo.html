@@ -30,16 +30,15 @@
                 <input th:field="*{urlAddress}" type="url" required>
                 <p class="error" th:errors="*{urlAddress}">Błąd</p>
             </label>
-
-            <label>
+            <label for="category">
                 Wybierz kategorię
-                <input th:field="*{category}" th:replace="~{fragments::category}">
+                <input id="category" th:field="*{category}" th:replace="~{fragments::category}">
             </label>
             <label for="file_upload">
                 Dodaj zdjęcie
                 <input class="file_upload" id="file_upload" type="file" th:field="*{imageFilename}"/>
             </label>
-            <button type="submit">Dodaj</button>
+            <button type="submit">Zatwierdź</button>
         </form>
     </div>
 </main>

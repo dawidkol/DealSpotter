@@ -23,15 +23,16 @@ class CategoryController {
 
     @GetMapping("/{categoryName}")
     String categoryPromo(@PathVariable String categoryName, Model model) {
+        List<PromoDto> promos;
         String allCategory = CategoryType.All.getDescription();
         if (categoryName.equalsIgnoreCase(allCategory)) {
-            List<PromoDto> allPromo = promoService.findAllPromo();
-            model.addAttribute("list", allPromo);
+            promos = promoService.findAllPromo();
+            model.addAttribute("list", promos);
         } else  {
-            List<PromoDto> promosByCategory = promoService.findByCategory(categoryName);
-            model.addAttribute("list", promosByCategory);
+            promos = promoService.findByCategory(categoryName);
+            model.addAttribute("list", promos);
         }
-        model.addAttribute("category", categoryName);
         return "index";
     }
+
 }

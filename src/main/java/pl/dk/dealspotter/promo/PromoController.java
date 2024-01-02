@@ -2,8 +2,6 @@ package pl.dk.dealspotter.promo;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,12 +27,10 @@ class PromoController {
     }
 
     @GetMapping("/save")
-    String savePromo(@CurrentSecurityContext SecurityContext currentSecurityContext, Model model) {
-        if (currentSecurityContext.getAuthentication().isAuthenticated()) {
-            SavePromoDto savePromoDto = new SavePromoDto();
-            model.addAttribute("promo", savePromoDto);
-            return "save-promo";
-        } else return "login";
+    String savePromo(Model model) {
+        SavePromoDto savePromoDto = new SavePromoDto();
+        model.addAttribute("promo", savePromoDto);
+        return "save-promo";
     }
 
     @PostMapping("/save")
@@ -82,6 +78,4 @@ class PromoController {
     String editConfirmation() {
         return "edit-promo-confirmation";
     }
-
-
 }

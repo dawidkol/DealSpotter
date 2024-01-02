@@ -15,7 +15,8 @@ public interface PromoRepository extends CrudRepository<Promo, Long> {
     @Query(value = "SELECT * FROM promo ORDER BY added DESC", nativeQuery = true)
     List<Promo> findAllPromosOrderByDateDescending();
 
-    List<Promo> findAllByCategory_NameIgnoreCase(String name);
+    @Query(value = "SELECT promo.* FROM promo JOIN category ON promo.category_id = category.id WHERE LOWER(category.name) = LOWER(:categoryName) ORDER BY promo.added DESC ", nativeQuery = true )
+    List<Promo> findAllByCategory(String categoryName);
 
     List<Promo> findAllByNameContainingIgnoreCaseAndCategory_NameIgnoreCase(String name, String categoryName);
 
