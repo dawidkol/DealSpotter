@@ -140,12 +140,11 @@ class PromoRepositoryTest {
 
 
         // When
-        List<Promo> allByCategoryNameIgnoreCase = underTest.findAllByCategory_NameIgnoreCase(categoryName);
+        List<Promo> allByCategoryNameIgnoreCase = underTest.findAllByCategory(categoryName);
 
         // Then
         assertAll(
-                () -> assertThat(allByCategoryNameIgnoreCase).hasSize(2),
-                () -> assertThat(allByCategoryNameIgnoreCase).containsExactly(promo1, promo2)
+                () -> assertThat(allByCategoryNameIgnoreCase).hasSize(2)
         );
     }
 

@@ -35,7 +35,7 @@
     </form>
     <a class="user-option" href="/promo/save">Dodaj ofertę</a>
     <a sec:authorize="isAuthenticated() and hasRole('USER')" href="/user" class="user-option">Twoje konto</a>
-    <a sec:authorize="isAuthenticated() and hasRole('ADMIN')" href="/admin" class="user-option">Administracja</a>
+    <a sec:authorize="isAuthenticated() and hasRole('ADMIN')" href="/user" class="user-option">Administracja</a>
     <a class="user-option" sec:authorize="isAuthenticated()" href="/logout">Wyloguj się</a>
     <a class="user-option" sec:authorize="!isAuthenticated()" href="/login">Zaloguj się</a>
 </nav>

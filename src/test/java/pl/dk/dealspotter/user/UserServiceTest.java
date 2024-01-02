@@ -216,7 +216,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         // When
-        Optional<UserDto> optionalUsername = underTest.findUser(user.getEmail());
+        Optional<UserDto> optionalUsername = underTest.findByEmail(user.getEmail());
 
         // Then
         assertAll(
@@ -236,7 +236,7 @@ class UserServiceTest {
         // Given
         UserRole userRole = UserRole.builder()
                 .id(1L)
-                .name("USER")
+                .name("User")
                 .description("Can log in service")
                 .build();
 
@@ -247,13 +247,13 @@ class UserServiceTest {
                 .password("currentPassword")
                 .roles(Set.of(userRole))
                 .build();
-        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userRepository.findAllByRolesNameIgnoreCase(UserService.USER_ROLE)).thenReturn(List.of(user));
 
         // When
         List<UserDto> allUsers = underTest.findAllUsers();
         // Then
         assertAll (
-                () -> verify(userRepository).findAll(),
+                () -> verify(userRepository).findAllByRolesNameIgnoreCase(UserService.USER_ROLE),
                 () -> assertThat(allUsers.size()).isEqualTo(1),
                 () -> assertThat(allUsers).isNotNull(),
                 () -> assertThat(allUsers).isNotEmpty(),

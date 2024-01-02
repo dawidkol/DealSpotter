@@ -21,7 +21,7 @@
             <tbody>
             <tr th:each="user: ${allUsers}" th:object="${user}">
                 <td th:text="*{email}">Nazwa</td>
-                <td><a class="delete" th:href="|/admin/user/delete/*{email}|">Usuń</a></td>
+                <td><a class="delete" th:href="|/user/delete/*{email}|">Usuń</a></td>
             </tr>
             </tbody>
         </table>

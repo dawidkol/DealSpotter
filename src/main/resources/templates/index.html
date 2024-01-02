@@ -8,7 +8,7 @@
 <main>
     <div class="menu">
         <a th:each="categoryType: ${T(pl.dk.dealspotter.category.CategoryType).values()}"
-           th:href="${'/category/' + categoryType.description.toLowerCase()}">
+                       th:href="${'/category/' + categoryType.description.toLowerCase()}">
             <span th:text="${categoryType.description}">Nieruchomości</span>
         </a>
     </div>
@@ -16,7 +16,7 @@
         <article class="discovery" th:each="promo: ${list}" th:object="${promo}">
             <div>
                 <a>
-                    <img th:src="${promo.imageFilename ne null} ?  ${promo.imageFilename} : @{/empty-image.png}"
+                    <img th:src="${promo.imageFilename ne null} ?  ${'/' + promo.imageFilename} : @{/empty-image.png}"
                          alt="tytuł promocji"
                          class="promo-list-item-poster"/>
                 </a>

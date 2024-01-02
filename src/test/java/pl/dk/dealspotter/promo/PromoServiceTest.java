@@ -109,7 +109,7 @@ class PromoServiceTest {
                 .category(category)
                 .build();
 
-        when(promoRepository.findAllByCategory_NameIgnoreCase(categoryName)).thenReturn(List.of(promo));
+        when(promoRepository.findAllByCategory(categoryName)).thenReturn(List.of(promo));
 
         // When
         List<PromoDto> listPromoDto = underTest.findByCategory(categoryName);
@@ -259,13 +259,8 @@ class PromoServiceTest {
                 .category(CategoryType.ELECTRONICS.getDescription())
                 .build();
 
-        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
-                .email(email)
-                .password("currentPassword")
-                .roles(Set.of("ADMIN"))
-                .build();
 
-        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+        when(userService.checkCredentials(email, UserService.ADMIN_ROLE)).thenReturn(true);
 
         // When
         underTest.savePromo(savePromoDto, email);
@@ -307,19 +302,15 @@ class PromoServiceTest {
         String email = "john@rambo.com";
 
         SavePromoDto savePromoDto = SavePromoDto.builder()
+                .id(1L)
                 .name("testPromo1")
                 .description("best promo you ever saw 1")
                 .price(new BigDecimal("99.99"))
                 .category(CategoryType.ELECTRONICS.getDescription())
                 .build();
 
-        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
-                .email(email)
-                .password("currentPassword")
-                .roles(Set.of("ADMIN"))
-                .build();
 
-        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+        when(userService.checkCredentials(email, "ADMIN")).thenReturn(true);
 
         // When
         underTest.updatePromo(savePromoDto, email);
@@ -564,9 +555,9 @@ class PromoServiceTest {
                 .roles(Set.of("NO_ROLE"))
                 .build();
 
-        when(promoRepository.findPromosByUser_Email(email)).thenReturn(List.of(promo));
-        when(promoRepository.findById(promoId)).thenReturn(Optional.of(promo));
-        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+        when(userService.checkCredentials(email, "NO_ROLE")).thenReturn(false);
+//        when(promoRepository.findById(promoId)).thenReturn(Optional.of(promo));
+//        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
 
         // When
         // Then
