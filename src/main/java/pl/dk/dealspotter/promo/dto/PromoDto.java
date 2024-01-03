@@ -20,5 +20,5 @@ public class PromoDto {
     private String category;
     private String imageFilename;
     private UserDto userDto;
-    private LocalDateTime localDateTime;
+    private LocalDateTime added;
 }
