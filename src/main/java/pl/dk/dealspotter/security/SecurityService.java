@@ -9,6 +9,4 @@ public class SecurityService {
     public static String findCurrentUsername() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
-
-
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import pl.dk.dealspotter.user.dto.UserCredentialsDto;
 import pl.dk.dealspotter.user.dto.UserDto;
 import pl.dk.dealspotter.user.dto.UserRegistrationDto;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
+@ActiveProfiles("test")
 class UserServiceTest {
 
     @Mock

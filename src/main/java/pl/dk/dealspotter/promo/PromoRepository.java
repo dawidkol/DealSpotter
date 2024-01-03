@@ -10,7 +10,6 @@ import java.util.List;
 @Repository
 public interface PromoRepository extends CrudRepository<Promo, Long> {
     List<Promo> findPromosByUser_Email(String email);
-    List<Promo> findAll();
 
     @Query(value = "SELECT * FROM promo ORDER BY added DESC", nativeQuery = true)
     List<Promo> findAllPromosOrderByDateDescending();

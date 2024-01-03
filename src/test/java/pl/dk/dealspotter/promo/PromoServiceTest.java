@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.server.ResponseStatusException;
 import pl.dk.dealspotter.category.Category;
 import pl.dk.dealspotter.category.CategoryType;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 class PromoServiceTest {
     @Mock
     private PromoRepository promoRepository;
@@ -518,46 +520,29 @@ class PromoServiceTest {
     }
 
     @Test
+    void itShouldThrow403StatusExceptionWhenPromoNotBelongsToUser() {
+        // Given
+        String email = "john@rambo.com";
+        Long promoId = 1L;
+
+        when(userService.checkCredentials(email, "NO_ROLE")).thenReturn(false);
+
+        // When
+        // Then
+        assertAll(
+                () -> assertThrows(ResponseStatusException.class, () -> underTest.deletePromo(promoId, email))
+        );
+    }
+
+    @Test
     void itShouldThrow403StatusExceptionWhenUserHasNoRole() {
         // Given
         String email = "john@rambo.com";
-        UserRole noRole = UserRole.builder()
-                .id(1L)
-                .name("EMPTY_ROLE")
-                .description("Can log in service")
-                .build();
-
-        User user = User.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Rambo")
-                .email(email)
-                .password("password")
-                .roles(Set.of(noRole))
-                .build();
-
         Long promoId = 1L;
-
-        Promo promo = Promo.builder()
-                .id(promoId)
-                .user(user)
-                .name("testPromo1")
-                .description("best promo you ever saw 1")
-                .price(new BigDecimal("99.99"))
-                .added(LocalDateTime.now().minusDays(1L))
-                .category(new Category())
-                .user(user)
-                .build();
-
-        UserCredentialsDto userCredentialsDto = UserCredentialsDto.builder()
-                .email(email)
-                .password("currentPassword")
-                .roles(Set.of("NO_ROLE"))
-                .build();
+        Promo promo = mock(Promo.class);
 
         when(userService.checkCredentials(email, "NO_ROLE")).thenReturn(false);
-//        when(promoRepository.findById(promoId)).thenReturn(Optional.of(promo));
-//        when(userService.findCredentialsByEmail(email)).thenReturn(Optional.of(userCredentialsDto));
+        when(promoRepository.findById(promoId)).thenReturn(Optional.of(promo));
 
         // When
         // Then

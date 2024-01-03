@@ -1,6 +1,7 @@
 package pl.dk.dealspotter.promo;
 
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.dk.dealspotter.category.Category;
 import pl.dk.dealspotter.category.CategoryRepository;
@@ -9,6 +10,7 @@ import pl.dk.dealspotter.promo.dto.SavePromoDto;
 import pl.dk.dealspotter.security.SecurityService;
 import pl.dk.dealspotter.user.User;
 import pl.dk.dealspotter.user.UserDtoMapper;
+import pl.dk.dealspotter.user.UserNotFoundException;
 import pl.dk.dealspotter.user.UserRepository;
 import pl.dk.dealspotter.user.dto.UserDto;
 
@@ -16,17 +18,12 @@ import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @Service
+@AllArgsConstructor
 class PromoDtoMapper {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final UserDtoMapper userDtoMapper;
-
-    public PromoDtoMapper(CategoryRepository categoryRepository, UserRepository userRepository, UserDtoMapper userDtoMapper) {
-        this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
-        this.userDtoMapper = userDtoMapper;
-    }
 
     PromoDto map(Promo promo) {
         return PromoDto.builder()
@@ -37,15 +34,15 @@ class PromoDtoMapper {
                 .urlAddress(promo.getUrlAddress())
                 .category(promo.getCategory().getName())
                 .imageFilename(promo.getImageFilename())
-                .userDto(getUserDto(promo))
-                .localDateTime(promo.getAdded())
+                .userDto(getUserId(promo))
+                .added(promo.getAdded())
                 .build();
     }
 
-    private UserDto getUserDto(Promo promo) {
+    private UserDto getUserId(Promo promo) {
         return userRepository.findById(promo.getUser().getId())
                 .map(userDtoMapper::map)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(UserNotFoundException::new);
     }
 
     Promo map(SavePromoDto savePromoDto) {
@@ -69,7 +66,7 @@ class PromoDtoMapper {
 
     private User findCurrentUsername() {
         return userRepository.findByEmail(SecurityService.findCurrentUsername())
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(UserNotFoundException::new);
     }
 
     private String setImage(SavePromoDto savePromoDto) {
