@@ -17,7 +17,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 class PromoControllerTest {
 
@@ -26,7 +26,7 @@ class PromoControllerTest {
 
     @Test
     @WithMockUser(username = "admin@admin.pl", roles = "ADMIN")
-    void itShouldSaveNewPromo() throws Exception {
+    void itShouldSaveNewPromoAndThenUpdate() throws Exception {
 
         // Step 1: Perform an HTTP GET request to /promo/save to get to save promo form
         Promo promo = new Promo();
