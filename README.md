@@ -62,9 +62,10 @@ A web application that enables users to track various offers and promotions in o
 
 <h4>Tests</h4>
 <p>We can run the tests directly from the IDE, if you are using IntelliJ it in the code view, next to the class name or method name, on the left side there will be a small green arrow. Clicking on it will show a menu from which you can select Run or Debug Test. If you have performed a test before and for some reason failed, the arrow will be red with an exclamation mark.</p>
-<p>Test coverage: 89% </p>
+<p>Test coverage: 92% </p>
 
-![Screenshot 2024-01-06 at 23.27.41.png](..%2F..%2FPrintScreen%2FScreenshot%202024-01-06%20at%2023.27.41.png)
+![Screenshot 2024-01-06 at 23 27 41](https://github.com/dawidkol/DealSpotter/assets/15035709/58fd0155-09d0-43e6-9714-987b9aeb8b21)
+
 <h4> Contact </h4>
 <p>If you encounter any issues with running the application or have any suggestions, please contact me via email at <a href="mailto:dawid.kolano@gmail.com">dawid.kolano@gmail.com</a></p>
 
