@@ -48,4 +48,32 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/user/all-users"));
 
     }
+
+    @Test
+    @WithMockUser(username = "stefan.zablocki@abc.pl", roles = "USER")
+    void shouldRestrictUserActionsBasedOnPermissions() throws Exception {
+
+        // Step 1: Perform HTTP GET request to /user to get to user template
+        mockMvc.perform(MockMvcRequestBuilders.get("/user"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("user"));
+
+        // Step 2: Perform HTTP GET request to /user/promo/all to see all users promo
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/promo/all"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("promo-list"));
+
+        // Step 3: Perform HTTP GET request to /user/promo/delete/2 to delete one promo
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/promo/delete/6"))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+
+        // Step 4: Perform HTTP GET request to /user/all-users to see all users
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/all-users"))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+
+        // Step 5: Perform HTTP GET request to /user/delete/admin@admin.pl to delete user
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/delete/admin@admin.pl"))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+
+    }
 }

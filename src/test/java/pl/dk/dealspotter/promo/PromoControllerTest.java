@@ -36,7 +36,7 @@ class PromoControllerTest {
 
 
         // Step 2: Perform an HTTP POST request to /promo/save to save new promo with invalid description data(to short)
-        MockMultipartFile file = new MockMultipartFile("imageFilename", "filename.txt", "text/plain", "file content".getBytes());
+        MockMultipartFile file = new MockMultipartFile("imageFilename", "empty-image.png", "image/tiff", "file content".getBytes());
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("name", "test promo");
