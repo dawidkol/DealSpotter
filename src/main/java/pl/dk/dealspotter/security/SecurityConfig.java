@@ -22,7 +22,7 @@ class SecurityConfig {
                 .requestMatchers("/")
                 .permitAll()
 
-                .requestMatchers("/user/delete/*{username}", "user/all-users")
+                .requestMatchers("/user/delete/*{username}", "/user/all-users")
                 .hasRole("ADMIN")
 
                 .requestMatchers("/user/promo/all","/user/promo/delete/{id}",  "/promo/save/**", "/promo/edit/**", "/promo/update/**")
