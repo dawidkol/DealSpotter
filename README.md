@@ -42,8 +42,8 @@ A web application that enables users to track various offers and promotions in o
     <li>Spring Web</li>
     <li>Spring Boot DevTools</li>
     <li>Spring Boot Test</li>
-    <li>Spring Boot Security</li>
-    <li>Spring Boot Validation</li>
+    <li>Spring Security</li>
+    <li>Spring Validation</li>
     <li>Thymeleaf</li>
     <li>Liquibase (version 4.23.2)</li>
     <li>H2 Database</li>
@@ -62,6 +62,9 @@ A web application that enables users to track various offers and promotions in o
 
 <h4>Tests</h4>
 <p>We can run the tests directly from the IDE, if you are using IntelliJ it in the code view, next to the class name or method name, on the left side there will be a small green arrow. Clicking on it will show a menu from which you can select Run or Debug Test. If you have performed a test before and for some reason failed, the arrow will be red with an exclamation mark.</p>
+<p>Test coverage: 89% </p>
+
+![Screenshot 2024-01-06 at 23.27.41.png](..%2F..%2FPrintScreen%2FScreenshot%202024-01-06%20at%2023.27.41.png)
 <h4> Contact </h4>
 <p>If you encounter any issues with running the application or have any suggestions, please contact me via email at <a href="mailto:dawid.kolano@gmail.com">dawid.kolano@gmail.com</a></p>
 
